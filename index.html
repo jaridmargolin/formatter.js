@@ -1,0 +1,146 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>formatter.js by firstopinion</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>formatter.js</h1>
+        <p>Format user input to match a specified pattern</p>
+
+        <p class="view"><a href="https://github.com/firstopinion/formatter.js">View the Project on GitHub <small>firstopinion/formatter.js</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/firstopinion/formatter.js/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/firstopinion/formatter.js/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/firstopinion/formatter.js">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="formatterjs-" class="anchor" href="#formatterjs-"><span class="octicon octicon-link"></span></a>formatter.js <a href="https://travis-ci.org/firstopinion/formatter.js"><img src="https://travis-ci.org/firstopinion/formatter.js.png" alt="Build Status"></a>
+</h1>
+
+<pre><code>   ___                    __  __              _   
+  / _/__  ______ _  ___ _/ /_/ /____ ____    (_)__
+ / _/ _ \/ __/  ' \/ _ `/ __/ __/ -_) __/   / (_-&lt;
+/_/ \___/_/ /_/_/_/\_,_/\__/\__/\__/_/ (_)_/ /___/
+                                        |___/     
+</code></pre>
+
+<p>Format user input to match a specified pattern</p>
+
+<h2>
+<a name="why" class="anchor" href="#why"><span class="octicon octicon-link"></span></a>Why?</h2>
+
+<p>Sometimes it is useful to format user input as they type. Existing libraries lacked flexibility. Also note that Formatter does not depend on jQuery or any existing libraries.</p>
+
+<h2>
+<a name="on-bower" class="anchor" href="#on-bower"><span class="octicon octicon-link"></span></a>On Bower</h2>
+
+<pre><code>bower install formatter
+</code></pre>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p><strong>Include script tag:</strong></p>
+
+<pre><code>&lt;script src="bower_components/formatter/formatter.js"&gt;  
+</code></pre>
+
+<h3>
+<a name="new-formatterel-opts" class="anchor" href="#new-formatterel-opts"><span class="octicon octicon-link"></span></a>new Formatter(el, opts)</h3>
+
+<pre><code>new Formatter(document.getElementById('credit-input'), {
+    'str': '{{XXXX}}-{{XXXX}}-{{XXXX}}-{{XXXX}}'
+});
+</code></pre>
+
+<ul>
+<li>
+<strong>el</strong> (required): Input element to manipulate</li>
+<li>
+<strong>opts</strong> (required): An object holding instance specific options.
+
+<ul>
+<li>
+<strong>pattern</strong> (required): String representing the pattern of your formatted input. User input areas begin with <code>{{</code> and end with <code>}}</code>. For example, a phone number may be represented: <code>({{XXX}}) {{XXX}}-{{XXXX}}</code>
+</li>
+<li>
+<strong>persistent</strong> (false): Boolean value representing whether the formatted characters are shown or added as the user types</li>
+<li>
+<strong>repeat</strong> (false): Boolean value representing whether the supplied pattern will be repeated.</li>
+</ul>
+</li>
+</ul><h2>
+<a name="examples--demos" class="anchor" href="#examples--demos"><span class="octicon octicon-link"></span></a>Examples / Demos</h2>
+
+<p>view live demos</p>
+
+<p><strong>Credit Card</strong>: 4242-4242-4242-4242</p>
+
+<pre><code>new Formatter(document.getElementById('credit-input'), {
+    'str': '{{XXXX}}-{{XXXX}}-{{XXXX}}-{{XXXX}}'
+});
+</code></pre>
+
+<p><strong>Phone Number</strong>: (802) 415-3411</p>
+
+<pre><code>new Formatter(document.getElementById('phone-input'), {
+    'str': '({{XXX}}) {{XXX}}-{{XXXX}}'
+});
+</code></pre>
+
+<p><strong>Number</strong>: 100,000,000,000</p>
+
+<pre><code>new Formatter(document.getElementById('num-input'), {
+    'str': '{{XXX}},',
+    'repeat': true
+});
+</code></pre>
+
+<h2>
+<a name="tests" class="anchor" href="#tests"><span class="octicon octicon-link"></span></a>Tests</h2>
+
+<p>Install Dependencies: </p>
+
+<pre><code>npm install
+</code></pre>
+
+<p>Run Tests:</p>
+
+<pre><code>npm test
+</code></pre>
+
+<h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>The MIT License (MIT) Copyright (c) 2013 First Opinion</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/firstopinion">firstopinion</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
