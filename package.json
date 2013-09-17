@@ -1,0 +1,18 @@
+{
+  "name": "formatter.js",
+  "version": "0.0.1",
+  "description": "Format user input to match a specified pattern",
+  "author": "Jarid Margolin <jarid@firstopinion.com>",
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/firstopinion/formatter.js"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "devDependencies": {
+    "mocha": "~1.9.0",
+    "chai": "~1.6.0"
+  },
+  "license": "MIT"
+}
