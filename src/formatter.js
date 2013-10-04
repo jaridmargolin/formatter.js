@@ -13,6 +13,23 @@
 
 (function() {
 
+
+  /////////////////////////////////////////////////////
+  // Setup
+  // - inspiration from underscore.js
+  /////////////////////////////////////////////////////
+  
+  // Establish the root object, window in the browser,
+  // or exports on the server.
+  var root = this;
+
+  if (typeof module !== 'undefined' && module.exports) {
+    exports.Formatter = Formatter;
+  } else {
+    root.Formatter = Formatter;
+  }
+
+
   /////////////////////////////////////////////////////
   // Defaults
   /////////////////////////////////////////////////////
@@ -27,7 +44,7 @@
   // Class
   /////////////////////////////////////////////////////
 
-  this.Formatter = function(el, opts) {
+  function Formatter(el, opts) {
     // Cache this
     var self = this;
 
@@ -50,7 +67,7 @@
       // Cache position before manipulating
       var pos = self._getCaretPosition(self.el);
       // Set text value
-      self.el.value = self._addChars(self.el.value);
+      self.el.value = self._addChars(self.el.value, self.chars);
       // Update cursorPosition
       self._updateCursorPos(pos);
     });
@@ -60,13 +77,13 @@
   // @private
   // Create an array holding all input matches
   //
-  Formatter.prototype._findMatches = function () {
+  Formatter.prototype._findMatches = function (str) {
     var matchExp = new RegExp('{{([^}]+)}}', 'g'),
         matches  = [],
         match;
 
     // Create array of matches
-    while(match = matchExp.exec(this.opts.str)) {
+    while(match = matchExp.exec(str)) {
       matches.push(match);
     }
     return matches;
@@ -77,11 +94,11 @@
   // Create an object holding all formatted characters
   // with corresponding positions
   //
-  Formatter.prototype._findChars = function () {
+  Formatter.prototype._findChars = function (str) {
     var DELIM_SIZE = 4;
-    var strLength  = this.opts.str.length,
+    var strLength  = str.length,
         matchIncr  = 0,
-        matches    = this._findMatches(),
+        matches    = this._findMatches(str),
         chars      = {};
 
     // Loop over all characters of the string 
@@ -93,7 +110,7 @@
         i += (match[1].length + DELIM_SIZE - 1);
         matchIncr ++;
       } else {
-        chars[i - (matchIncr * DELIM_SIZE)] = this.opts.str[i];
+        chars[i - (matchIncr * DELIM_SIZE)] = str[i];
       }
     }
     return chars;
@@ -117,13 +134,13 @@
   // @private
   // Return updated string with formatted characters added
   //
-  Formatter.prototype._addChars = function (str) {
+  Formatter.prototype._addChars = function (str, chars) {
     // Does not cache str length as it changes during iteration
     for (var i = 0; i < str.length; i++) {
       // If character exists at position but has not
       // yet been added, add at location
-      if (this.chars[i] && (str[i] !== this.chars[i])) {
-        str = str.substr(0, i) + this.chars[i] + str.substr(i, str.length);
+      if (chars[i] && (str[i] !== chars[i])) {
+        str = str.substr(0, i) + chars[i] + str.substr(i, str.length);
       }
     }
     return str
@@ -144,6 +161,7 @@
         destObj[key] = arguments[i][key];
       }
     }
+    return destObj;
   }
 
   //
