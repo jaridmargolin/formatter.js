@@ -5,10 +5,6 @@ env:
   global:
     - secure: <encrypted string here>
     - secure: <encrypted string here>
-before_install:
-  - sudo apt-get update
-  - sudo apt-get install openjdk-7-jre-headless
-  - sudo wget https://selenium.googlecode.com/files/selenium-server-standalone-2.35.0.jar -P /var/lib/selenium
 notifications:
   email:
     - jarid@firstopinion.co

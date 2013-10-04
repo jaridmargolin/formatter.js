@@ -41,7 +41,6 @@ Usage
 * **opts** (required): An object holding instance specific options.
   * **pattern** (required): String representing the pattern of your formatted input. User input areas begin with `{{` and end with `}}`. For example, a phone number may be represented: `({{XXX}}) {{XXX}}-{{XXXX}}`
   * **persistent** (false): Boolean value representing whether the formatted characters are shown or added as the user types
-  * **repeat** (false): Boolean value representing whether the supplied pattern will be repeated.
 
 
 Examples / Demos
@@ -61,12 +60,6 @@ view live demos
         'str': '({{XXX}}) {{XXX}}-{{XXXX}}'
     });
 
-**Number**: 100,000,000,000
-
-    new Formatter(document.getElementById('num-input'), {
-        'str': '{{XXX}},',
-        'repeat': true
-    });
 
 Tests
 -----
@@ -80,11 +73,26 @@ Run Tests:
     npm test
 
 
-  gem install travis
-  cd my_project
-  travis encrypt MY_SECRET_ENV=super_secret
+Todos
+-----
 
-  TRAVIS_SECURE_ENV_VARS
+* **Add repeat**
+
+    **Number**: 100,000,000,000
+    
+        new Formatter(document.getElementById('num-input'), {
+            'str': '{{XXX}},',
+            'repeat': true
+        });
+
+* **Selenium Tests (browserstack or saucelabs)**
+    
+    ** notes**
+    
+      gem install travis
+      cd my_project
+      travis encrypt MY_SECRET_ENV=super_secret
+      TRAVIS_SECURE_ENV_VARS
 
 
 License
