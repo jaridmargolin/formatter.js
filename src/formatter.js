@@ -58,19 +58,56 @@
     }
 
     // Setup
-    self.curPos = 0;
-    self.chars  = self._findChars();
-    self.el     = el;
-    
-    // Format on keyup
-    self._addEventListener(self.el, 'keyup', function (evt) {
-      // Cache position before manipulating
-      var pos = self._getCaretPosition(self.el);
-      // Set text value
-      self.el.value = self._addChars(self.el.value, self.chars);
-      // Update cursorPosition
-      self._updateCursorPos(pos);
-    });
+    self.sLength = 0;
+    self.chars   = self._findChars(self.opts.str);
+    self.el      = el;
+
+    // Update
+    var update = function (evt) {
+      // We work with stripped str
+      var fullStr  = self.el.value,
+          stripStr = fullStr.replace(/[^a-z0-9]/gi,''),
+          sLength  = stripStr.length;
+
+      // Get current position
+      self.pos = self._getCaretPosition(self.el);
+
+      // If cursor on character bump position and character added
+      if (self.chars[self.pos - 1] && self.sLength < sLength) { self.pos ++; }
+
+      // Add chars
+      var inputChanged = self.sLength !== sLength;
+      if (!(!inputChanged && self.pos == fullStr.length))  {
+        // Format text
+        self.el.value = self._addChars(stripStr, self.chars, inputChanged);
+        // Set new position
+        self._setCaretPosition(self.el, self.pos);
+      }
+
+      // Set new length
+      self.sLength = sLength;
+    };
+
+    // Listeners
+    self._addEventListener(self.el, 'keyup', update);
+  };
+
+  //
+  // @private
+  // Return updated string with formatted characters added
+  //
+  Formatter.prototype._addChars = function (str, chars, updatePos) {
+    // Loop over str and add characters at designated counts
+    // Does not cache str length as it changes during iteration
+    for (var i = 0; i < str.length + 1; i++) {
+      // If character exists at position, add
+      if (chars[i]) {
+        str = str.substr(0, i) + chars[i] + str.substr(i, str.length);
+        if (updatePos && this.pos == i) { this.pos++; }
+      }
+    }
+    // Return value
+    return str
   };
 
   //
@@ -116,36 +153,6 @@
     return chars;
   }
 
-  //
-  // @private
-  // Move cursor to correct location after adding characters
-  //
-  Formatter.prototype._updateCursorPos = function (pos) {
-    // For every formatted character added move the caret position
-    for (var i = 2; true; i++) {
-      var count = this.el.value.length - i;
-      if (typeof this.chars[count] === 'undefined') { break }
-      this.pos++
-    }
-    this._setCaretPosition(this.el, pos);
-  }
-
-  //
-  // @private
-  // Return updated string with formatted characters added
-  //
-  Formatter.prototype._addChars = function (str, chars) {
-    // Does not cache str length as it changes during iteration
-    for (var i = 0; i < str.length; i++) {
-      // If character exists at position but has not
-      // yet been added, add at location
-      if (chars[i] && (str[i] !== chars[i])) {
-        str = str.substr(0, i) + chars[i] + str.substr(i, str.length);
-      }
-    }
-    return str
-  };
-
 
   /////////////////////////////////////////////////////
   // Class Utils
@@ -188,6 +195,7 @@
     } else if (el.selectionStart || el.selectionStart == '0') {
       pos = el.selectionStart
     }
+    return pos
   };
 
   //

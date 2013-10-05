@@ -115,11 +115,11 @@ var testAddChars = function () {
   };
 
   // full raw number
-  var fullResult = Formatter.prototype._addChars('8002364717', chars);
+  var fullResult = Formatter.prototype._addChars('8002364717', chars, false);
   assert.equal(fullResult, '(800) 236.4717');
 
   // partial formatted number
-  var partialResult = Formatter.prototype._addChars('(800)236.4717', chars);
+  var partialResult = Formatter.prototype._addChars('(800)236.4717', chars, false);
   assert.equal(fullResult, '(800) 236.4717');
 };
 

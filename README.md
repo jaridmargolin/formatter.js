@@ -10,16 +10,19 @@ formatter.js [![Build Status](https://travis-ci.org/firstopinion/formatter.js.pn
 Format user input to match a specified pattern
 
 
+
 Why?
 ----
 
-Sometimes it is useful to format user input as they type. Existing libraries lacked flexibility. Also note that Formatter does not depend on jQuery or any existing libraries.
+Sometimes it is useful to format user input as they type. Existing libraries lacked proper functionality / felxibility. Formatter was built from the ground up with no dependencies.
+
 
 
 On Bower
 --------
 
     bower install formatter
+
 
 
 Usage
@@ -36,17 +39,14 @@ Usage
         'str': '{{XXXX}}-{{XXXX}}-{{XXXX}}-{{XXXX}}'
     });
 
-
 * **el** (required): Input element to manipulate
 * **opts** (required): An object holding instance specific options.
   * **pattern** (required): String representing the pattern of your formatted input. User input areas begin with `{{` and end with `}}`. For example, a phone number may be represented: `({{XXX}}) {{XXX}}-{{XXXX}}`
-  * **persistent** (false): Boolean value representing whether the formatted characters are shown or added as the user types
+
 
 
 Examples / Demos
 ----------------
-
-view live demos
 
 **Credit Card**: 4242-4242-4242-4242
 
@@ -54,11 +54,16 @@ view live demos
         'str': '{{XXXX}}-{{XXXX}}-{{XXXX}}-{{XXXX}}'
     });
 
+[view demo](/demos.html#credit)
+
 **Phone Number**: (802) 415-3411
 
     new Formatter(document.getElementById('phone-input'), {
         'str': '({{XXX}}) {{XXX}}-{{XXXX}}'
     });
+
+[view demo](/demos.html#credit)
+
 
 
 Tests
@@ -73,26 +78,22 @@ Run Tests:
     npm test
 
 
+
 Todos
 -----
 
-* **Add repeat**
+* Selenium Tests (browserstack or saucelabs)
+* Add repeat opt
+* Add persistent opt
 
-    **Number**: 100,000,000,000
-    
-        new Formatter(document.getElementById('num-input'), {
-            'str': '{{XXX}},',
-            'repeat': true
-        });
 
-* **Selenium Tests (browserstack or saucelabs)**
-    
-    ** notes**
-    
-      gem install travis
-      cd my_project
-      travis encrypt MY_SECRET_ENV=super_secret
-      TRAVIS_SECURE_ENV_VARS
+
+Known Issues
+------------
+
+* Paste event doesnt trigger format
+* Cmd + key (not currently allowed)
+
 
 
 License
