@@ -59,7 +59,7 @@ Examples / Demos
         'str': '{{XXXX}}-{{XXXX}}-{{XXXX}}-{{XXXX}}'
     });
 
-[view demo](/demos.html#credit)
+[view demo](http://firstopinion.github.io/formatter.js/demos.html#credit)
 
 **Phone Number**: (802) 415-3411
 
@@ -67,7 +67,7 @@ Examples / Demos
         'str': '({{XXX}}) {{XXX}}-{{XXXX}}'
     });
 
-[view demo](/demos.html#credit)
+[view demo](http://firstopinion.github.io/formatter.js/demos.html#credit)
 
 
 
