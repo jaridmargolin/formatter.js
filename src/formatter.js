@@ -59,51 +59,69 @@
 
     // Setup
     self.sLength = 0;
+    self.fLength = 0;
     self.chars   = self._findChars(self.opts.str);
     self.el      = el;
 
     // Update
     var update = function (evt) {
-      // We work with stripped str
-      var fullStr  = self.el.value,
-          stripStr = fullStr.replace(/[^a-z0-9]/gi,''),
-          sLength  = stripStr.length;
-
-      // Get current position
+      // The first thing we need to do is get the cursor pos
       self.pos = self._getCaretPosition(self.el);
 
-      // If cursor on character bump position and character added
-      if (self.chars[self.pos - 1] && self.sLength < sLength) { self.pos ++; }
+      // Cache values
+      var fullStr  = self.el.value;
+          stripStr = fullStr.replace(/[^a-z0-9]/gi,'');
 
-      // Add chars
-      var inputChanged = self.sLength !== sLength;
-      if (!(!inputChanged && self.pos == fullStr.length))  {
-        // Format text
-        self.el.value = self._addChars(stripStr, self.chars, inputChanged);
-        // Set new position
+      // Cache values about values
+      var fLength = fullStr.length,
+          sLength = stripStr.length;
+          
+      // We need to find out information regarding
+      // the users current state
+      var movingForward = fullStr.length > self.fLength,
+          changedInput = sLength !== self.sLength,
+          addedInput = sLength > self.sLength,
+          cursAtChar = self.chars[self.pos - 1],
+          cursAtEnd = self.pos == fullStr.length;
+
+      // If the user added input we must format. If the cursor
+      // isn't at the end of the string we must also format.
+      if (changedInput || !cursAtEnd) {
+        // If we are moving forward notify.
+        self.el.value = self._addChars(stripStr, self.chars, movingForward);
+        // If cursor position is at a formatted character
+        // and the user added input we must bump the cursor
+        // position forward.
+        if (cursAtChar && addedInput) { self.pos++; }
+        // Set cursor position
         self._setCaretPosition(self.el, self.pos);
       }
 
-      // Set new length
+      // Save lengths to use on next update
+      self.fLength = self.el.value.length;
       self.sLength = sLength;
     };
 
     // Listeners
-    self._addEventListener(self.el, 'keyup', update);
+    self._addEventListener(self.el, 'keyup', function (evt) {
+      update(evt);
+    });
   };
 
   //
   // @private
   // Return updated string with formatted characters added
   //
-  Formatter.prototype._addChars = function (str, chars, updatePos) {
+  Formatter.prototype._addChars = function (str, chars, movingForward) {
     // Loop over str and add characters at designated counts
-    // Does not cache str length as it changes during iteration
+    // Note: does not cache str length as it changes during iter
     for (var i = 0; i < str.length + 1; i++) {
-      // If character exists at position, add
+      // If character exists at position, add at position
       if (chars[i]) {
         str = str.substr(0, i) + chars[i] + str.substr(i, str.length);
-        if (updatePos && this.pos == i) { this.pos++; }
+        // If a character was added at this position and we are
+        // moving forward. Move cursor forward.
+        if (movingForward && this.pos == i) { this.pos++; }
       }
     }
     // Return value

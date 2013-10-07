@@ -62,7 +62,7 @@ Examples / Demos
         'str': '({{XXX}}) {{XXX}}-{{XXXX}}'
     });
 
-[view demo](http://firstopinion.github.io/formatter.js/demos.html#credit)
+[view demo](http://firstopinion.github.io/formatter.js/demos.html#phone)
 
 
 
