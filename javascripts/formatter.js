@@ -6,18 +6,20 @@
  *                                           |___/  
  * v0.0.1
  * Copyright (c) 2013 First Opinion
- * formatter.js is open sourced under the MIT license.   
+ * formatter.js is open sourced under the MIT license.
+ *
+ * thanks to digitalBush/jquery.maskedinput for some of the trickier
+ * keycode handling
  */
 
 
 
 (function() {
 
-
-  /////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
   // Setup
   // - inspiration from underscore.js
-  /////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
   
   // Establish the root object, window in the browser,
   // or exports on the server.
@@ -29,171 +31,358 @@
     root.Formatter = Formatter;
   }
 
+  // Need some userAgent info for keycode handling
+  var ua = navigator.userAgent,
+      iPhone = /iphone/i.test(ua);
 
-  /////////////////////////////////////////////////////
+
+  /////////////////////////////////////////////////////////////////////////////
   // Defaults
-  /////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
 
   var defaults = {
     persistent: false,
-    repeat: false
+    repeat: false,
+    placeholder: ' '
   };
 
 
-  /////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
   // Class
-  /////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
 
+  //
+  // @public
+  // Class Constructor - Called with new Formatter(el, opts)
+  // Responsible for setting up required instance variables, and
+  // attaching the event listener to the element
+  //
   function Formatter(el, opts) {
-    // Cache this
-    var self = this;
+    // The element to FORMAT
+    this.el = el;
 
-    // Merge opts with defaults
-    self.opts = self._extend({}, defaults, opts);
-    // Make sure we have valid opts
-    if (!self.opts.str) {
-      new TypeError('Must provide a string');
-    } else if (self.opts.persistent && self.opts.repeat) {
-      new TypeError('Cannot persist and repeat');
+    // Make sure we have an element
+    if (!this.el) { 
+      throw new TypeError('Must provide an existing element');
     }
 
-    // Setup
-    self.sLength = 0;
-    self.fLength = 0;
-    self.chars   = self._findChars(self.opts.str);
-    self.el      = el;
+    // Merge opts with defaults
+    this.opts = extend({}, defaults, opts);
 
-    // Update
-    var update = function (evt) {
-      // The first thing we need to do is get the cursor pos
-      self.pos = self._getCaretPosition(self.el);
+    // Make sure we have valid opts
+    if (typeof this.opts.pattern === 'undefined') {
+      throw new TypeError('Must provide a pattern');
+    } else if (this.opts.persistent && this.opts.repeat) {
+      throw new TypeError('Cannot persist and repeat');
+    }
 
-      // Cache values
-      var fullStr  = self.el.value;
-          stripStr = fullStr.replace(/[^a-z0-9]/gi,'');
+    // Get info about the given pattern
+    var patternInfo = getPatternInfo(this.opts.pattern);
+    this.chars = patternInfo.chars;
+    this.maxLength = patternInfo.maxLength;
 
-      // Cache values about values
-      var fLength = fullStr.length,
-          sLength = stripStr.length;
-          
-      // We need to find out information regarding
-      // the users current state
-      var movingForward = fullStr.length > self.fLength,
-          changedInput = sLength !== self.sLength,
-          addedInput = sLength > self.sLength,
-          cursAtChar = self.chars[self.pos - 1],
-          cursAtEnd = self.pos == fullStr.length;
-
-      // If the user added input we must format. If the cursor
-      // isn't at the end of the string we must also format.
-      if (changedInput || !cursAtEnd) {
-        // If we are moving forward notify.
-        self.el.value = self._addChars(stripStr, self.chars, movingForward);
-        // If cursor position is at a formatted character
-        // and the user added input we must bump the cursor
-        // position forward.
-        if (cursAtChar && addedInput) { self.pos++; }
-        // Set cursor position
-        self._setCaretPosition(self.el, self.pos);
-      }
-
-      // Save lengths to use on next update
-      self.fLength = self.el.value.length;
-      self.sLength = sLength;
-    };
-
+    // If persistent, trigger format
+    if (this.opts.persistent) {
+      this._processKey(null, true);
+      this.el.blur();
+    }
+    
     // Listeners
-    self._addEventListener(self.el, 'keyup', function (evt) {
-      update(evt);
+    // Keep class context
+    var self = this;
+    addEventListener(this.el, 'keydown', function (evt) {
+      self._keyDown(evt);
+    });
+    addEventListener(this.el, 'keypress', function (evt) {
+      self._keyPress(evt);
+    });
+    addEventListener(this.el, 'paste', function (evt) {
+      self._paste(evt);
     });
   };
 
   //
   // @private
-  // Return updated string with formatted characters added
+  // This is the handler called on all keyDown strokes. All keys fire this
+  // handler. We use this handler to deal with special keys. Only process
+  // delete keys.
+  // 
   //
-  Formatter.prototype._addChars = function (str, chars, movingForward) {
-    // Loop over str and add characters at designated counts
-    // Note: does not cache str length as it changes during iter
-    for (var i = 0; i < str.length + 1; i++) {
-      // If character exists at position, add at position
-      if (chars[i]) {
-        str = str.substr(0, i) + chars[i] + str.substr(i, str.length);
-        // If a character was added at this position and we are
-        // moving forward. Move cursor forward.
-        if (movingForward && this.pos == i) { this.pos++; }
-      }
+  Formatter.prototype._keyDown = function (evt) {
+    // The first thing we need is the character code
+    var k = evt.which || evt.keyCode;
+
+    // If delete key
+    if (k && isDelKey(k)) {
+      // Process the keyCode and prevent default
+      this._processKey(null, true);
+      return preventDefault(evt);
     }
-    // Return value
-    return str
   };
 
   //
   // @private
-  // Create an array holding all input matches
+  // This is the handler called on all keyPress strokes. This handler
+  // is used to process characters.
   //
-  Formatter.prototype._findMatches = function (str) {
-    var matchExp = new RegExp('{{([^}]+)}}', 'g'),
-        matches  = [],
-        match;
+  Formatter.prototype._keyPress = function (evt) {
+    // The first thing we need is the character code
+    var k = evt.which || evt.keyCode;
 
-    // Create array of matches
-    while(match = matchExp.exec(str)) {
-      matches.push(match);
+    // Process the keyCode and prevent default
+    if (!isDelKey(k) && !isModifier(evt)) {
+      this._processKey(String.fromCharCode(k), false);
+      return preventDefault(evt);
     }
-    return matches;
   };
+
+  //
+  // @private
+  // Handle paste events.
+  //
+  Formatter.prototype._paste = function (evt) {
+    // Process the clipboard paste and prevent default
+    this._processKey(getClipBoardData(evt), false);
+    return preventDefault(evt);
+  };
+
+  //
+  // @private
+  // Using the provided key information, alter the value of the
+  // instance element.
+  //
+  Formatter.prototype._processKey = function (chars, isDelKey) {
+    // Our old newPos is now our oldPos
+    // String manipulation depends on current selection/position
+    this.sel = getInputSelection(this.el);
+
+    // Get the el vlaue (prior to processing current key)
+    this.val = this.el.value;
+    // We will record the delta of our actions so that we can
+    // properly account for it during formatting
+    this.delta = 0;
+
+    // If characters were highlighted, we will need to remove them
+    if (this.sel.start !== this.sel.end) {
+      this.val = removeCharFrom(this.val, this.sel.start, this.sel.end);
+      this.delta = -Math.abs(this.sel.start - this.sel.end);
+    // If pressed key is a del key, and the caret pos is not at start,
+    // remove at caret pos
+    } else if (isDelKey && this.sel.start-1 >= 0) {
+      this.val = removeCharFrom(this.val, this.sel.end -1, this.sel.end);
+      this.delta = -1;
+    }
+
+    // If the key is not a del key, it should convert to a str
+    if (!isDelKey) {
+      // Add char at position and increment delta
+      this.val = addCharsAtPos(this.val, chars, this.sel.start);
+      this.delta += chars.length;
+    }
+
+    // Set current caret position
+    this.curPos = this.sel.end;
+
+    // Format el.value (also handles updating caret position)
+    this._formatValue();
+  };
+
+  //
+  // @private
+  // Alter element value to display characters matching the provided
+  // instance pattern. Also responsible for updatin
+  //
+  Formatter.prototype._formatValue = function () {
+    // Our new caret position
+    this.newPos = this.curPos + this.delta;
+
+    // Remove all formatted chars from val
+    this._removeChars();
+    // Add formatted characters
+    this._addChars();
+
+    // Adhere to maxLength and set to el.value
+    this.el.value = this.val.substr(0, this.maxLength);
+
+    // Set new caret position
+    setCaretPos(this.el, this.newPos);
+  };
+
+  //
+  // @private
+  // Loop over val and add formatted chars as necessary
+  //
+  Formatter.prototype._addChars = function () {
+    if (this.opts.persistent) {
+      // Avoid caching val.length, as it changes during manipulations
+      for (var i = 0; i <= this.maxLength; i++) {
+        if (!this.val[i]) {
+          this.val = addCharsAtPos(this.val, this.opts.placeholder, i);
+        }
+        this._addChar(i);
+      }
+    } else {
+      // Avoid caching val.length, as it changes during manipulations
+      for (var i = 0; i <= this.val.length; i++) {
+        console.log('ok');
+        this._addChar(i);
+      }
+    }
+  }
+
+  //
+  // @private
+  // Add formattted char at position
+  //
+  Formatter.prototype._addChar = function (i) {
+    // If char exists at position
+    var char = this.chars[i];
+    if (!char) { return true }
+
+    // If chars are added in between the old pos and new pos
+    // we need to increment pos and delta
+    if (isBetween(i, [this.sel.start -1, this.newPos +1])) {
+      this.newPos ++;
+      this.delta ++;
+    }
+
+    // When moving backwards there are some race conditions where we
+    // dont want to add the character
+    if (this.delta < 0 && (this.val[i] == char )) { return true }
+
+    // Update value
+    this.val = addCharsAtPos(this.val, char, i)
+  };
+
+  //
+  // @private
+  // Remove all formatted before and after a specified pos
+  //
+  Formatter.prototype._removeChars = function () {
+    // Account for shifts during removal
+    var shift = 0;
+    // Loop through all possible char positions
+    for (var i = 0; i <= this.maxLength; i++) {
+      if (!this.chars[i]) { continue }
+      // Transformed position accounts for shift from removal, as well
+      // as delta from user input (after pos)
+      var transPos = (i >= this.curPos) ? i + this.delta + shift : i + shift;
+      // If the value to be removed exists at pos
+      if (this.chars[i] == this.val[transPos]) {
+        this.val = removeCharFrom(this.val, transPos, transPos + 1);
+        shift--;
+      }
+    }
+  }
+
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Class Utils
+  /////////////////////////////////////////////////////////////////////////////
 
   //
   // @private
   // Create an object holding all formatted characters
   // with corresponding positions
   //
-  Formatter.prototype._findChars = function (str) {
+  var getPatternInfo = function (pattern) {
+    // Account for delim characters
     var DELIM_SIZE = 4;
-    var strLength  = str.length,
-        matchIncr  = 0,
-        matches    = this._findMatches(str),
-        chars      = {};
+    // Object we are populating
+    var chars = {};
+    // Record the str length
+    var i = 0;
+    // We need to gather info regarding all matches
+    var matches = [];
 
-    // Loop over all characters of the string 
-    // If character is part of a match skip to the end of
-    // the match and move onto the next... else add to chars obj
-    for (var i = 0; i < strLength; i++) {
+    // Populate array of matches
+    var re = new RegExp('{{([^}]+)}}', 'g');
+    while(match = re.exec(pattern)) {
+      matches.push(match);
+    }
+
+    // Cache pattern length
+    var patternLength  = pattern.length;
+    // Match increments everytime a match is found
+    var matchIncr  = 0;
+    // Loop over all chars in pattern.
+    for (i; i < patternLength; i++) {
+      // The current match object
       var match = matches[matchIncr];
+      // If the current char is the start of a match, we need to
+      // skip over it (i+=) and move onto the next match (matchIncr++)
       if (i == match.index) {
         i += (match[1].length + DELIM_SIZE - 1);
         matchIncr ++;
+      // If not we must add to chars obj
       } else {
-        chars[i - (matchIncr * DELIM_SIZE)] = str[i];
+        delimCharCount = matchIncr * DELIM_SIZE
+        chars[i - delimCharCount] = pattern[i];
       }
     }
-    return chars;
-  }
 
+    // Return the chars object and the length of the pattern
+    return { chars: chars, maxLength: i - (matchIncr * DELIM_SIZE) }
+  };
 
-  /////////////////////////////////////////////////////
-  // Class Utils
-  /////////////////////////////////////////////////////
+  //
+  // @private
+  // Add a given character to a string at a defined pos
+  //
+  var addCharsAtPos = function (str, chars, pos) {
+    return str.substr(0, pos) + chars + str.substr(pos, str.length);
+  };
+
+  //
+  // @private
+  // Remove a span of characters
+  //
+  var removeCharFrom = function (str, start, end) {
+    return str.substr(0, start) + str.substr(end, str.length);
+  };
 
   //
   // @private
   // Shallow copy properties from n objects to destObj
   //
-  Formatter.prototype._extend = function (destObj) {
+  var extend = function (destObj) {
     for (var i = 1; i < arguments.length; i++) {
       for (var key in arguments[i]) {
         destObj[key] = arguments[i][key];
       }
     }
     return destObj;
+  };
+
+  //
+  // @private
+  // Return true/false is num false between bounds
+  //
+  var isBetween = function (num, bounds) {
+    bounds.sort(function(a,b) { return a-b });
+    return (num > bounds[0] && num < bounds[1])
+  };
+
+  // @private
+  // Returns true/false if k is a del key
+  //
+  var isDelKey = function (k) {
+    return k === 8 || k === 46 || (iPhone && k === 127)
+  };
+
+  //
+  // @private
+  // Returns true/false if modifier key is held down
+  //
+  var isModifier = function (evt) {
+    return evt.ctrlKey || evt.altKey || evt.metaKey
   }
 
   //
   // @private
   // Helper method for cross browser event listeners
   //
-  Formatter.prototype._addEventListener = function (el, evt, handler) {
+  var addEventListener = function (el, evt, handler) {
     return (typeof el.addEventListener != "undefined")
       ? el.addEventListener(evt, handler, false)
       : el.attachEvent('on' + evt, handler);
@@ -201,31 +390,81 @@
 
   //
   // @private
-  // Returns the caret (cursor) position of the specified text field.
+  // Helper method for cross browser implementation of preventDefault
   //
-  Formatter.prototype._getCaretPosition = function (el) {
-    var pos = 0;
-    if (document.selection) {
-      el.focus();
-      var selRange = document.selection.createRange();
-      selRange.moveStart ('character', -el.value.length);
-      pos = selRange.text.length;
-    } else if (el.selectionStart || el.selectionStart == '0') {
-      pos = el.selectionStart
+  var preventDefault = function (evt) {
+    (evt.preventDefault) ? evt.preventDefault() : (evt.returnValue = false);
+  };
+
+  //
+  // @private
+  // Helper method for cross browser implementation for grabbing
+  // clipboard data
+  //
+  var getClipBoardData = function (evt) {
+    if (evt.clipboardData) { return evt.clipboardData.getData('Text') }
+    if (window.clipboardData) { return window.clipboardData.getData('Text') }
+  }
+  //
+  // @private
+  // Get start and end positions of selected input. Return 0's
+  // if there is no selectiion data
+  //
+  var getInputSelection = function (el) {
+    // If normal browser return with result
+    if (typeof el.selectionStart == "number") {
+      return { 
+        start: el.selectionStart,
+        end: el.selectionEnd
+      }
     }
-    return pos
+
+    // Uh-Oh. We must be IE. Fun with TextRange!!
+    var range = document.selection.createRange();
+    // Determine if there is a selection
+    if (range && range.parentElement() == el) {
+      var inputRange = el.createTextRange(),
+          endRange   = el.createTextRange(),
+          length     = el.value.length;
+
+      // Create a working TextRange for the input selection
+      inputRange.moveToBookmark(range.getBookmark());
+
+      // Move endRange start pos to end pos (hence endRange)
+      endRange.collapse(false);
+      
+      // If we are at the very end of the input, start and end
+      // must both be the length of the el.value
+      if (inputRange.compareEndPoints("StartToEnd", endRange) > -1) {
+        return { start: length, end: length }
+      }
+
+      // Note: moveStart usually returns the units moved, which one may
+      // think is -length, however, it will stop when it gets to the
+      // start of the range, thus giving us the negative value of the pos.
+      return {
+        start: -inputRange.moveStart("character", -length),
+        end: -inputRange.moveEnd("character", -length)
+      }
+    }
+
+    //Return 0's on no selection data
+    return { start: 0, end: 0 }
   };
 
   //
   // @private
   // Set the caret position at a specified location
   //
-  Formatter.prototype._setCaretPosition = function (el, pos) {
+  var setCaretPos = function (el, pos) {
+    // If normal browser
     if (el.setSelectionRange) {
       el.focus();
       el.setSelectionRange(pos,pos);
+
+    // IE = TextRange fun
     } else if (el.createTextRange) {
-      var range = ctrl.createTextRange();
+      var range = el.createTextRange();
       range.collapse(true);
       range.moveEnd('character', pos);
       range.moveStart('character', pos);

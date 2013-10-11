@@ -56,7 +56,7 @@ Examples / Demos
 **Credit Card**: 4242-4242-4242-4242
 
     new Formatter(document.getElementById('credit-input'), {
-        'str': '{{XXXX}}-{{XXXX}}-{{XXXX}}-{{XXXX}}'
+        'pattern': '{{XXXX}}-{{XXXX}}-{{XXXX}}-{{XXXX}}'
     });
 
 [view demo](http://firstopinion.github.io/formatter.js/demos.html#credit)
@@ -64,7 +64,8 @@ Examples / Demos
 **Phone Number**: (802) 415-3411
 
     new Formatter(document.getElementById('phone-input'), {
-        'str': '({{XXX}}) {{XXX}}-{{XXXX}}'
+        'pattern': '({{XXX}}) {{XXX}}.{{XXXX}}'
+        'persistent': true
     });
 
 [view demo](http://firstopinion.github.io/formatter.js/demos.html#phone)
@@ -88,17 +89,6 @@ Todos
 -----
 
 * Selenium Tests (browserstack or saucelabs)
-* Add repeat opt
-* Add persistent opt
-
-
-
-Known Issues
-------------
-
-* Paste event doesnt trigger format
-* Cmd + key (not currently allowed)
-
 
 
 License

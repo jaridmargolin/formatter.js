@@ -45,14 +45,14 @@
       var creditInput = document.getElementById('credit-input');
       if (creditInput) {
         new Formatter(creditInput, {
-            'str': '{{XXXX}}-{{XXXX}}-{{XXXX}}-{{XXXX}}',
+            'pattern': '{{XXXX}}-{{XXXX}}-{{XXXX}}-{{XXXX}}'
         });
       }
       var phoneInput = document.getElementById('phone-input');
       if (creditInput) {
         new Formatter(phoneInput, {
-            'str': '({{XXX}}) {{XXX}}-{{XXXX}}',
-            'persistence': true
+            'pattern': '({{XXX}}) {{XXX}}.{{XXXX}}',
+            'persistent': true
         });
       }
     </script>
