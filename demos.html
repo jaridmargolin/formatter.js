@@ -14,7 +14,7 @@ layout: master
   </div>
 </div>
 <pre><code>new Formatter(document.getElementById('credit-input'), {
-    'str': '{{XXXX}}-{{XXXX}}-{{XXXX}}-{{XXXX}}'
+    'pattern': '{{XXXX}}-{{XXXX}}-{{XXXX}}-{{XXXX}}'
 });</code></pre>
 
 <h2 id="phone">Phone Number</h2>
@@ -25,7 +25,8 @@ layout: master
   </div>
 </div>
 <pre><code>new Formatter(document.getElementById('phone-input'), {
-    'str': '({{XXX}}) {{XXX}}-{{XXXX}}'
+    'pattern': '({{XXX}}) {{XXX}}.{{XXXX}}',
+    'persistent': true
 });</code></pre>
 
 {% endraw %}
