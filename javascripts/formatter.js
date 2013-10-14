@@ -31,20 +31,27 @@
     root.Formatter = Formatter;
   }
 
-  // Need some userAgent info for keycode handling
-  var ua = navigator.userAgent,
-      iPhone = /iphone/i.test(ua);
-
 
   /////////////////////////////////////////////////////////////////////////////
+  // Scope Vars
+  /////////////////////////////////////////////////////////////////////////////
+
   // Defaults
-  /////////////////////////////////////////////////////////////////////////////
-
   var defaults = {
     persistent: false,
     repeat: false,
     placeholder: ' '
   };
+  
+  // Regexs for input validation
+  var inptRegs = {
+    '9': new RegExp('[0-9]'),
+    'a': new RegExp('[A-Za-z]'),
+    '*': new RegExp('[A-Za-z0-9]')
+  };
+
+  // Useragent info for keycode handling
+  var iPhone = /iphone/i.test(navigator.userAgent);
 
 
   /////////////////////////////////////////////////////////////////////////////
@@ -78,18 +85,32 @@
 
     // Get info about the given pattern
     var patternInfo = getPatternInfo(this.opts.pattern);
-    this.chars = patternInfo.chars;
-    this.maxLength = patternInfo.maxLength;
+    this.maxLength  = patternInfo.maxLength;
+    this.chars      = patternInfo.chars;
+    this.inpts      = patternInfo.inpts;
 
-    // If persistent, trigger format
+    // Init values
+    this.focusStart = 0;
+    this.hldrs      = {};
+
+    // If persistence, format on start
     if (this.opts.persistent) {
       this._processKey(null, true);
       this.el.blur();
     }
-    
-    // Listeners
-    // Keep class context
+
+    // Attach all listeners
+    this._addEventListeners();
+  };
+
+  //
+  // @private
+  //
+  Formatter.prototype._addEventListeners = function () {
+    // Cache this
     var self = this;
+
+    // Handlers
     addEventListener(this.el, 'keydown', function (evt) {
       self._keyDown(evt);
     });
@@ -99,6 +120,16 @@
     addEventListener(this.el, 'paste', function (evt) {
       self._paste(evt);
     });
+
+    // Persistence handlers for focus
+    if (this.opts.persistent) {
+      addEventListener(this.el, 'focus', function (evt) {
+        self._focus(evt);
+      });
+      addEventListener(this.el, 'mousedown', function (evt) {
+        self._focus(evt);
+      });
+    }
   };
 
   //
@@ -148,6 +179,26 @@
 
   //
   // @private
+  // Handle paste events.
+  //
+  Formatter.prototype._focus = function (evt) {
+    // Wrapped in timeout so that we can grab input selection
+    var self = this;
+    setTimeout(function () {
+      // Grab selection
+      var selection = getInputSelection(self.el);
+      // Char check
+      var isAfterStart = selection.end > self.focusStart;
+          isFirstChar  = selection.end == 0;
+      // If clicked in front of start, refocus to start
+      if (isAfterStart || isFirstChar) {
+        setInputSelection(self.el, self.focusStart);
+      }
+    }, 0);
+  };
+
+  //
+  // @private
   // Using the provided key information, alter the value of the
   // instance element.
   //
@@ -164,12 +215,13 @@
 
     // If characters were highlighted, we will need to remove them
     if (this.sel.start !== this.sel.end) {
-      this.val = removeCharFrom(this.val, this.sel.start, this.sel.end);
+      this.val = removeCharsFrom(this.val, this.sel.start, this.sel.end);
       this.delta = -Math.abs(this.sel.start - this.sel.end);
+
     // If pressed key is a del key, and the caret pos is not at start,
     // remove at caret pos
     } else if (isDelKey && this.sel.start-1 >= 0) {
-      this.val = removeCharFrom(this.val, this.sel.end -1, this.sel.end);
+      this.val = removeCharsFrom(this.val, this.sel.end -1, this.sel.end);
       this.delta = -1;
     }
 
@@ -179,9 +231,6 @@
       this.val = addCharsAtPos(this.val, chars, this.sel.start);
       this.delta += chars.length;
     }
-
-    // Set current caret position
-    this.curPos = this.sel.end;
 
     // Format el.value (also handles updating caret position)
     this._formatValue();
@@ -193,19 +242,28 @@
   // instance pattern. Also responsible for updatin
   //
   Formatter.prototype._formatValue = function () {
-    // Our new caret position
+    // Set caret pos
+    this.curPos = this.sel.end;
     this.newPos = this.curPos + this.delta;
 
     // Remove all formatted chars from val
     this._removeChars();
-    // Add formatted characters
-    this._addChars();
 
-    // Adhere to maxLength and set to el.value
+    // Validate inpts
+    this._validateInpts();
+
+    // Add formatted characters
+    if (this.opts.persistent) { 
+      this._addCharsPersist();
+    } else {
+      this._addChars();
+    }
+
+    // Adhere to maxLength
     this.el.value = this.val.substr(0, this.maxLength);
 
     // Set new caret position
-    setCaretPos(this.el, this.newPos);
+    setInputSelection(this.el, this.newPos);
   };
 
   //
@@ -213,22 +271,28 @@
   // Loop over val and add formatted chars as necessary
   //
   Formatter.prototype._addChars = function () {
-    if (this.opts.persistent) {
-      // Avoid caching val.length, as it changes during manipulations
-      for (var i = 0; i <= this.maxLength; i++) {
-        if (!this.val[i]) {
-          this.val = addCharsAtPos(this.val, this.opts.placeholder, i);
-        }
-        this._addChar(i);
-      }
-    } else {
-      // Avoid caching val.length, as it changes during manipulations
-      for (var i = 0; i <= this.val.length; i++) {
-        console.log('ok');
-        this._addChar(i);
-      }
+    // Avoid caching val.length, as it changes during manipulations
+    for (var i = 0; i <= this.val.length; i++) {
+      this._addChar(i);
     }
-  }
+  };
+
+  //
+  // @private
+  // Loop over vals and add formatted chars as necessary.
+  //
+  Formatter.prototype._addCharsPersist = function () {
+    for (var i = 0; i <= this.maxLength; i++) {
+      if (!this.val[i]) {
+        // Add placeholder at pos
+        this.val = addCharsAtPos(this.val, this.opts.placeholder, i);
+        this.hldrs[i] = this.opts.placeholder;
+      }
+      this._addChar(i);
+    }
+    // Adjust focusStart to make sure its not on a formatted char
+    while (this.chars[this.focusStart]) { this.focusStart++ }
+  };
 
   //
   // @private
@@ -246,9 +310,20 @@
       this.delta ++;
     }
 
+    // If character added before focusStart, incr
+    if (i <= this.focusStart) {
+      this.focusStart++;
+    }
+
     // When moving backwards there are some race conditions where we
     // dont want to add the character
     if (this.delta < 0 && (this.val[i] == char )) { return true }
+
+    // Updateholder
+    if (this.hldrs[i]) {
+      delete this.hldrs[i]
+      this.hldrs[i + 1] = this.opts.placeholder;
+    }
 
     // Update value
     this.val = addCharsAtPos(this.val, char, i)
@@ -259,21 +334,55 @@
   // Remove all formatted before and after a specified pos
   //
   Formatter.prototype._removeChars = function () {
+    // Delta shouldn't include placeholders
+    if (this.sel.end > this.focusStart) {
+      this.delta += this.sel.end - this.focusStart
+    }
+
     // Account for shifts during removal
     var shift = 0;
     // Loop through all possible char positions
     for (var i = 0; i <= this.maxLength; i++) {
-      if (!this.chars[i]) { continue }
+
+      // If no char or holder at position, skip current incr
+      if (!this.chars[i] && !this.hldrs[i]) { continue }
+
       // Transformed position accounts for shift from removal, as well
       // as delta from user input (after pos)
-      var transPos = (i >= this.curPos) ? i + this.delta + shift : i + shift;
-      // If the value to be removed exists at pos
-      if (this.chars[i] == this.val[transPos]) {
-        this.val = removeCharFrom(this.val, transPos, transPos + 1);
-        shift--;
+      var transPos = (i >= this.sel.start) ? i + this.delta + shift : i + shift;
+
+      // If we can't remove a char, skip current incr
+      var isChar = this.chars[i] && this.chars[i] == this.val[transPos];
+          isHldr = this.hldrs[i] && this.hldrs[i]== this.val[transPos];
+      if (!isChar && !isHldr) { continue }
+
+      // Remove and account for shift
+      this.val = removeCharsFrom(this.val, transPos, transPos + 1);
+      shift--;
+    }
+
+    // All hldrs should be removed now
+    this.hldrs = {}
+    // Set focusStart to last character
+    this.focusStart = this.val.length;
+  };
+
+  //
+  // @private
+  // Make sure all inpts are valid, else remove and update delta
+  //
+  Formatter.prototype._validateInpts = function () {
+    for (var i = 0; i < this.val.length; i++) {
+      var inptType = this.inpts[i];
+      if (!inptRegs[inptType] || !inptRegs[inptType].test(this.val[i])) {
+        this.val = removeCharsFrom(this.val, i, i + 1);
+        this.delta--;
+        this.newPos--;
+        this.focusStart--;
+        i--;
       }
     }
-  }
+  };
 
 
   /////////////////////////////////////////////////////////////////////////////
@@ -288,42 +397,69 @@
   var getPatternInfo = function (pattern) {
     // Account for delim characters
     var DELIM_SIZE = 4;
-    // Object we are populating
-    var chars = {};
-    // Record the str length
-    var i = 0;
-    // We need to gather info regarding all matches
-    var matches = [];
 
-    // Populate array of matches
-    var re = new RegExp('{{([^}]+)}}', 'g');
-    while(match = re.exec(pattern)) {
-      matches.push(match);
+    // Object to return
+    var info = { inpts: {}, chars: {} };
+
+    // Pattern matches
+    var matches = [],
+        regexp  = new RegExp('{{([^}]+)}}', 'g');
+
+    while(match = regexp.exec(pattern)) {
+      matches.push(match)
     }
 
-    // Cache pattern length
-    var patternLength  = pattern.length;
-    // Match increments everytime a match is found
-    var matchIncr  = 0;
     // Loop over all chars in pattern.
-    for (i; i < patternLength; i++) {
+    var mCount = iCount = i = 0,
+        pLength = pattern.length;
+    
+    for (i; i < pLength; i++) {
       // The current match object
-      var match = matches[matchIncr];
-      // If the current char is the start of a match, we need to
-      // skip over it (i+=) and move onto the next match (matchIncr++)
+      var match = matches[mCount];
+
+      // If the current char is the start of a match
       if (i == match.index) {
+        // Cache match value
+        var val = match[1];
+        // Add to inpt
+        var valLength = val.length;
+        for (var j = 0; j < valLength; j++) {
+          info.inpts[iCount] = val[j];
+          iCount++;
+        }
+        // Incr i in order to skip over the rest of these chars
         i += (match[1].length + DELIM_SIZE - 1);
-        matchIncr ++;
+        // Move onto next match
+        mCount ++;
+
       // If not we must add to chars obj
       } else {
-        delimCharCount = matchIncr * DELIM_SIZE
-        chars[i - delimCharCount] = pattern[i];
+        info.chars[i - (mCount * DELIM_SIZE)] = pattern[i];
       }
     }
 
+    // Set maxLength
+    info.maxLength = i - (mCount * DELIM_SIZE);
+
     // Return the chars object and the length of the pattern
-    return { chars: chars, maxLength: i - (matchIncr * DELIM_SIZE) }
+    return info;
   };
+
+  //
+  // @private
+  // Return array filled with match objects
+  //
+  var getPatternMatch = function (pattern) {
+    // Populate array of matches
+    var matches = [],
+        regexp  = new RegExp('{{([^}]+)}}', 'g');
+
+    while(match = regexp.exec(pattern)) {
+      matches.push(match)
+    }
+
+    return matches
+  }
 
   //
   // @private
@@ -337,7 +473,7 @@
   // @private
   // Remove a span of characters
   //
-  var removeCharFrom = function (str, start, end) {
+  var removeCharsFrom = function (str, start, end) {
     return str.substr(0, start) + str.substr(end, str.length);
   };
 
@@ -376,7 +512,7 @@
   //
   var isModifier = function (evt) {
     return evt.ctrlKey || evt.altKey || evt.metaKey
-  }
+  };
 
   //
   // @private
@@ -404,7 +540,8 @@
   var getClipBoardData = function (evt) {
     if (evt.clipboardData) { return evt.clipboardData.getData('Text') }
     if (window.clipboardData) { return window.clipboardData.getData('Text') }
-  }
+  };
+
   //
   // @private
   // Get start and end positions of selected input. Return 0's
@@ -456,7 +593,7 @@
   // @private
   // Set the caret position at a specified location
   //
-  var setCaretPos = function (el, pos) {
+  var setInputSelection = function (el, pos) {
     // If normal browser
     if (el.setSelectionRange) {
       el.focus();

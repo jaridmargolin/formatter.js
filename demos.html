@@ -10,22 +10,22 @@ layout: master
 <p><strong>Ex</strong>: 4242-4242-4242-4242</p>
 <div class="demo-input">
   <div class="input-wrap input-s1 input-white">
-    <input type="text" class="input" id="credit-input" maxlength="19">
+    <input type="text" class="input" id="credit-input" maxlength="19" pattern="\d*">
   </div>
 </div>
 <pre><code>new Formatter(document.getElementById('credit-input'), {
-    'pattern': '{{XXXX}}-{{XXXX}}-{{XXXX}}-{{XXXX}}'
+    'pattern': '{{9999}}-{{9999}}-{{9999}}-{{9999}}'
 });</code></pre>
 
 <h2 id="phone">Phone Number</h2>
 <p><strong>Ex</strong>: (802) 415-3411</p>
 <div class="demo-input">
   <div class="input-wrap input-s1 input-white">
-    <input type="text" class="input" id="phone-input" maxlength="14">
+    <input type="text" class="input" id="phone-input" maxlength="14" pattern="\d*">
   </div>
 </div>
 <pre><code>new Formatter(document.getElementById('phone-input'), {
-    'pattern': '({{XXX}}) {{XXX}}.{{XXXX}}',
+    'pattern': '({{999}}) {{999}}.{{9999}}',
     'persistent': true
 });</code></pre>
 

@@ -40,13 +40,10 @@ Usage
 
 ### new Formatter(el, opts)
 
-    new Formatter(document.getElementById('credit-input'), {
-        'str': '{{XXXX}}-{{XXXX}}-{{XXXX}}-{{XXXX}}'
-    });
-
 * **el** (required): Input element to manipulate
 * **opts** (required): An object holding instance specific options.
   * **pattern** (required): String representing the pattern of your formatted input. User input areas begin with `{{` and end with `}}`. For example, a phone number may be represented: `({{XXX}}) {{XXX}}-{{XXXX}}`
+  * **persistent** : \[False\] Boolean representing if the formatted characters are always visible (persistent), or if they appear as you type.
 
 
 
@@ -56,7 +53,7 @@ Examples / Demos
 **Credit Card**: 4242-4242-4242-4242
 
     new Formatter(document.getElementById('credit-input'), {
-        'pattern': '{{XXXX}}-{{XXXX}}-{{XXXX}}-{{XXXX}}'
+        'pattern': '{{9999}}-{{9999}}-{{9999}}-{{9999}}'
     });
 
 [view demo](http://firstopinion.github.io/formatter.js/demos.html#credit)
@@ -64,7 +61,7 @@ Examples / Demos
 **Phone Number**: (802) 415-3411
 
     new Formatter(document.getElementById('phone-input'), {
-        'pattern': '({{XXX}}) {{XXX}}.{{XXXX}}'
+        'pattern': '({{999}}) {{999}}.{{9999}}'
         'persistent': true
     });
 
@@ -89,6 +86,12 @@ Todos
 -----
 
 * Selenium Tests (browserstack or saucelabs)
+* Break out into src files & create build script
+
+Known Issues
+------------
+
+* Some patterns break the regex (should escape str before running)
 
 
 License
