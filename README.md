@@ -14,7 +14,7 @@ Format user input to match a specified pattern
 Why?
 ----
 
-Sometimes it is useful to format user input as they type. Existing libraries lacked proper functionality / felxibility. Formatter was built from the ground up with no dependencies.
+Sometimes it is useful to format user input as they type. Existing libraries lacked proper functionality / felxibility. Formatter was built from the ground up with no dependencies. There is however a jquery wrapper version for quick use.
 
 
 
@@ -28,45 +28,38 @@ On Bower
 Usage
 -----
 
-**Include script tag:**
+### Vanilla Javascript
 
-    <script src="bower_components/formatter/lib/formatter.js">
+* **uncompressed**: formatter.js
+* **compressed**: formatter.min.js
 
-or
-
-  <script src="bower_components/formatter/lib/formatter.min.js"> 
-    
-
-### new Formatter(el, opts)
+#### new Formatter(el, opts)
 
     new Formatter(document.getElementById('credit-input'), {
-        'pattern': '{{999}}-{{999}}-{{999}}-{{9999}}'
-        'persistent': true
+      'pattern': '{{999}}-{{999}}-{{999}}-{{9999}}'
+      'persistent': true
     });
 
-* **el** (required): Input element to manipulate
-* **opts** (required): An object holding instance specific options.
-  * **pattern** (required): String representing the pattern of your formatted input. User input areas begin with `{{` and end with `}}`. For example, a phone number may be represented: `({{999}}) {{999}}-{{999}}`
 
+### Jquery
 
-Examples / Demos
-----------------
+* **uncompressed**: jquery.formatter.js
+* **compressed**: jquery.formatter.min.js
 
-**Credit Card**: 4242-4242-4242-4242
+#### $(selector).formatter(opts)
 
-    new Formatter(document.getElementById('credit-input'), {
-        'str': '{{XXXX}}-{{XXXX}}-{{XXXX}}-{{XXXX}}'
+    $('#credit-input').formatter({
+      'pattern': '{{999}}-{{999}}-{{999}}-{{9999}}'
+      'persistent': true
     });
 
-[view demo](http://firstopinion.github.io/formatter.js/demos.html#credit)
 
-**Phone Number**: (802) 415-3411
 
-    new Formatter(document.getElementById('phone-input'), {
-        'str': '({{XXX}}) {{XXX}}-{{XXXX}}'
-    });
+Opts
+----
 
-[view demo](http://firstopinion.github.io/formatter.js/demos.html#phone)
+* **pattern** (required): String representing the pattern of your formatted input. User input areas begin with `{{` and end with `}}`. For example, a phone number may be represented: `({{999}}) {{999}}-{{999}}`,
+* **persistent**: [False] Boolean representing if the formatted characters are always visible (persistent), or if they appear as you type.
 
 
 
@@ -80,23 +73,6 @@ Install Dependencies:
 Run Tests:
     
     npm test
-
-
-
-Todos
------
-
-* Selenium Tests (browserstack or saucelabs)
-* Add repeat opt
-* Add persistent opt
-
-
-
-Known Issues
-------------
-
-* Paste event doesnt trigger format
-* Cmd + key (not currently allowed)
 
 
 
