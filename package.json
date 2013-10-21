@@ -1,6 +1,6 @@
 {
   "name": "formatter.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Format user input to match a specified pattern",
   "author": "Jarid Margolin <jarid@firstopinion.com>",
   "repository" : {
@@ -11,7 +11,12 @@
     "test": "make test"
   },
   "devDependencies": {
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-uglify": "~0.2.4",
+    "grunt-contrib-jshint": "~0.6.4",
+    "grunt": "~0.4.1",
     "mocha": "~1.9.0",
+    "sinon": "~1.7.3",
     "chai": "~1.6.0"
   },
   "license": "MIT"

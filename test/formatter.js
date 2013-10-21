@@ -1,5 +1,5 @@
 /*
- * test/formatter.js:
+ * test/utils.js:
  *
  * (C) 2013 First Opinion
  * MIT LICENCE
@@ -7,147 +7,102 @@
  */ 
 
 // 3rd party
-var should = require('chai').should(),
-    assert = require('chai').assert;
+var restore = require('sinon').restore,
+    mock    = require('sinon').mock,
+    stub    = require('sinon').stub;
+
+var should  = require('chai').should(),
+    assert  = require('chai').assert;
 
 // first party
-var Formatter = require('../src/formatter').Formatter;
+var Formatter = require('../src/formatter'),
+    inptSel   = require('../src/inpt-sel'),
+    utils     = require('../src/utils'),
+    User      = require('./fake-user/user');
 
-
-/////////////////////////////////////////////////////
-// Unit Tests
-/////////////////////////////////////////////////////
 
 //
-// ._extend
+// pattern.js tests
 //
-var testExtend = function () {
-  // Setup Data
-  var defaults, opts;
-  defaults = {
-    'extend'   : 'should',
-    'overwrite': 'all'
-  };
-  opts = {
-    'overwrite': 'default',
-    'values'   : 'to',
-    'the'      : 'destObj'
-  };
+describe('formatter.js', function () {
 
-  // Run extend
-  var result = Formatter.prototype._extend({}, defaults, opts);
-  // Check results
-  assert.deepEqual(result, {
-    'extend'   : 'should',
-    'overwrite': 'default',
-    'values'   : 'to',
-    'the'      : 'destObj'
-  });
-  // Make sure defaults & opts were not changed
-  assert.deepEqual({
-    'extend'   : 'should',
-    'overwrite': 'all'
-  }, defaults);
-  assert.deepEqual({
-    'overwrite': 'default',
-    'values'   : 'to',
-    'the'      : 'destObj'
-  }, opts);
-};
+  // Scope vars
+  var formatted, user, sel, el;
 
-//
-// ._findMatches
-//
-var testFindMatches = function () {
-  // Run _findMatches
-  var testStr = '({{XXX}}) {{XXX}}.{{XXXX}}',
-      result = Formatter.prototype._findMatches(testStr);
-  // Check results
-  assert.deepEqual([
-    { 
-      '0': '{{XXX}}',
-      '1': 'XXX',
-      'index': 1,
-      'input': '({{XXX}}) {{XXX}}.{{XXXX}}'
-    },
-    { 
-      '0': '{{XXX}}',
-      '1': 'XXX',
-      'index': 10,
-      'input': '({{XXX}}) {{XXX}}.{{XXXX}}'
-    },
-    { 
-      '0': '{{XXXX}}',
-      '1': 'XXXX',
-      'index': 18,
-      'input': '({{XXX}}) {{XXX}}.{{XXXX}}'
-    }
-  ], result);
-};
-
-//
-// ._findChars
-//
-var testFindChars = function () {
-  // Run _findMatches
-  var testStr = '({{XXX}}) {{XXX}}.{{XXXX}}',
-    result = Formatter.prototype._findChars(testStr);
-
-  // Check results
-  assert.deepEqual(result, {
-    '0': '(',
-    '4': ')',
-    '5': ' ',
-    '9': '.'
-  });
-};
-
-//
-// ._addChars
-//
-var testAddChars = function () {
-  // Cache character pattern
-  var chars = {
-    '0': '(',
-    '4': ')',
-    '5': ' ',
-    '9': '.'
-  };
-
-  // full raw number
-  var fullResult = Formatter.prototype._addChars('8002364717', chars, false);
-  assert.equal(fullResult, '(800) 236.4717');
-
-  // partial formatted number
-  var partialResult = Formatter.prototype._addChars('(800)236.4717', chars, false);
-  assert.equal(fullResult, '(800) 236.4717');
-};
-
-
-/////////////////////////////////////////////////////
-// Selenium Tests
-/////////////////////////////////////////////////////
-
-// Comming soon
-
-
-/////////////////////////////////////////////////////
-// Test Suite
-/////////////////////////////////////////////////////
-
-describe('# formatter.js', function () {
-  // Unit
-  describe('# unit tests', function () {
-    describe('# class utils', function () {
-      it('Should return an object with merged properties', testExtend);
+  before(function () {
+    // Fake user to carry out keyboard and mouse events
+    user = new User();
+    // Set init el
+    el = { value: '', blur: function () {} };
+    // Set init caret position
+    sel = { begin: 0, end: 0 };
+    // Stub
+    stub(utils, 'addListener', function (evt, type, handler) {
+      user.on(type, handler);
     });
-    describe('# class methods', function () {
-      it('Should create an array holding match objs', testFindMatches);
-      it('Should create an object holding all chars', testFindChars);
-      it('Should add chars to str in correct positions', testAddChars);
+    stub(inptSel, 'get', function () {
+      return sel;
+    });
+    stub(inptSel, 'set', function (el, pos) {
+      sel.begin = sel.end = pos;
+    });
+    // New instance
+    formatted = new Formatter(el, {
+      pattern: '({{999}}) {{999}}-{{9999}}',
+      persistent: true
     });
   });
 
-  // Selenium
-  // describe('selenium tests', seleniumTests);
+  after(function () {
+    utils.addListener.restore();
+    inptSel.get.restore();
+    inptSel.set.restore();
+  });
+
+  it('Should set init values and merge defaults', function () {
+    // Check opts
+    assert.equal(formatted.opts.pattern, '({{999}}) {{999}}-{{9999}}');
+    assert.isTrue(formatted.opts.persistent);
+    // Check pattern
+    assert.isObject(formatted.chars);
+    assert.isObject(formatted.inpts);
+    assert.isNumber(formatted.mLength);
+    // Check init values
+    assert.isObject(formatted.hldrs);
+    assert.isNumber(formatted.focus);
+  });
+
+  it('Should format chars as they are entered', function (done) {
+    user.keySeq('1237890', function () {
+      assert.equal(formatted.el.value, '(123) 789-0   ');
+      done();
+    });
+  });
+
+  it('Should focus to the next available inpt position', function () {
+    assert.equal(formatted.focus, 11);
+  });
+
+  it('Should fromat chars entered mid str', function (done) {
+    sel = { begin: 6, end: 6 };
+    user.keySeq('456', function () {
+      assert.equal(formatted.el.value, '(123) 456-7890');
+      done();
+    });
+  });
+
+  it('Should delete chars when highlighted', function () {
+    sel = { begin: 2, end: 8 };
+    user.key('backspace');
+    assert.equal(formatted.el.value, '(167) 890-    ');
+  });
+
+  it('Should handle pasting multiple characters', function (done) {
+    sel = { begin: 2, end: 2 };
+    user.paste('2345', function () {
+      assert.equal(formatted.el.value, '(123) 456-7890');
+      done();
+    });
+  });
+
 });

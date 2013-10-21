@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>formatter.js by firstopinion</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>formatter.js</h1>
+        <p>Format user input to match a specified pattern</p>
+
+        <p class="view"><a href="https://github.com/firstopinion/formatter.js">View the Project on GitHub <small>firstopinion/formatter.js</small></a></p>
+        
+        <div class="menu">
+          <p class="menu-item"><a href="index.html">+ Docs</a></p>
+          <p class="menu-item"><a href="demos.html">+ Demos</a></p>
+        </div>
+
+        <ul>
+          <li><a href="https://github.com/firstopinion/formatter.js/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/firstopinion/formatter.js/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/firstopinion/formatter.js">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+
+        <h1 id='formatterjs_build_status'>formatter.js <a href='https://travis-ci.org/firstopinion/formatter.js'><img alt='Build Status' src='https://travis-ci.org/firstopinion/formatter.js.png' /></a></h1>
+
+<pre><code>   ___                    __  __              _   
+  / _/__  ______ _  ___ _/ /_/ /____ ____    (_)__
+ / _/ _ \/ __/  &#39; \/ _ `/ __/ __/ -_) __/   / (_-&lt;
+/_/ \___/_/ /_/_/_/\_,_/\__/\__/\__/_/ (_)_/ /___/
+                                        |___/     </code></pre>
+
+<p>Format user input to match a specified pattern</p>
+
+<h2 id='why'>Why?</h2>
+
+<p>Sometimes it is useful to format user input as they type. Existing libraries lacked proper functionality / felxibility. Formatter was built from the ground up with no dependencies.</p>
+
+<h2 id='on_bower'>On Bower</h2>
+
+<pre><code>bower install formatter</code></pre>
+
+<h2 id='usage'>Usage</h2>
+
+<p><strong>Include script tag:</strong></p>
+
+<pre><code>&lt;script src=&quot;bower_components/formatter/formatter.js&quot;&gt;  </code></pre>
+
+<h3 id='new_formatterel_opts'>new Formatter(el, opts)</h3>
+
+<ul>
+<li>
+<p><strong>el</strong> (required): Input element to manipulate</p>
+</li>
+
+<li>
+<p><strong>opts</strong> (required): An object holding instance specific options.</p>
+
+<ul>
+<li><strong>pattern</strong> (required): String representing the pattern of your formatted input. User input areas begin with <code>{{</code> and end with <code>}}</code>. For example, a phone number may be represented: <code>({{XXX}}) {{XXX}}-{{XXXX}}</code></li>
+
+<li><strong>persistent</strong> : [False] Boolean representing if the formatted characters are always visible (persistent), or if they appear as you type.</li>
+</ul>
+</li>
+</ul>
+
+<h2 id='examples__demos'>Examples / Demos</h2>
+
+<p><strong>Credit Card</strong>: 4242-4242-4242-4242</p>
+
+<pre><code>new Formatter(document.getElementById(&#39;credit-input&#39;), {
+    &#39;pattern&#39;: &#39;{{9999}}-{{9999}}-{{9999}}-{{9999}}&#39;
+});</code></pre>
+
+<p><a href='http://firstopinion.github.io/formatter.js/demos.html#credit'>view demo</a></p>
+
+<p><strong>Phone Number</strong>: (802) 415-3411</p>
+
+<pre><code>new Formatter(document.getElementById(&#39;phone-input&#39;), {
+    &#39;pattern&#39;: &#39;({{999}}) {{999}}.{{9999}}&#39;
+    &#39;persistent&#39;: true
+});</code></pre>
+
+<p><a href='http://firstopinion.github.io/formatter.js/demos.html#phone'>view demo</a></p>
+
+<h2 id='tests'>Tests</h2>
+
+<p>Install Dependencies:</p>
+
+<pre><code>npm install</code></pre>
+
+<p>Run Tests:</p>
+
+<pre><code>npm test</code></pre>
+
+<h2 id='todos'>Todos</h2>
+
+<ul>
+<li>Selenium Tests (browserstack or saucelabs)</li>
+
+<li>Break out into src files &amp; create build script</li>
+</ul>
+
+<h2 id='known_issues'>Known Issues</h2>
+
+<ul>
+<li>Some patterns break the regex (should escape str before running)</li>
+</ul>
+
+<h2 id='license'>License</h2>
+
+<p>The MIT License (MIT) Copyright (c) 2013 First Opinion</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &#8220;Software&#8221;), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED &#8220;AS IS&#8221;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+
+      </section>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    <script src="javascripts/formatter.js"></script>
+    
+    <script>
+      var creditInput = document.getElementById('credit-input');
+      if (creditInput) {
+        new Formatter(creditInput, {
+            'pattern': '{{9999}}-{{9999}}-{{9999}}-{{9999}}'
+        });
+      }
+      var phoneInput = document.getElementById('phone-input');
+      if (creditInput) {
+        new Formatter(phoneInput, {
+            'pattern': '({{999}}) {{999}}.{{9999}}',
+            'persistent': true
+        });
+      }
+    </script>
+    
+  </body>
+</html>
