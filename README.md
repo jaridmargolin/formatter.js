@@ -30,19 +30,23 @@ Usage
 
 **Include script tag:**
 
-    <script src="bower_components/formatter/formatter.js">  
+    <script src="bower_components/formatter/lib/formatter.js">
+
+or
+
+  <script src="bower_components/formatter/lib/formatter.min.js"> 
     
 
 ### new Formatter(el, opts)
 
     new Formatter(document.getElementById('credit-input'), {
-        'str': '{{XXXX}}-{{XXXX}}-{{XXXX}}-{{XXXX}}'
+        'pattern': '{{999}}-{{999}}-{{999}}-{{9999}}'
+        'persistent': true
     });
 
 * **el** (required): Input element to manipulate
 * **opts** (required): An object holding instance specific options.
-  * **pattern** (required): String representing the pattern of your formatted input. User input areas begin with `{{` and end with `}}`. For example, a phone number may be represented: `({{XXX}}) {{XXX}}-{{XXXX}}`
-
+  * **pattern** (required): String representing the pattern of your formatted input. User input areas begin with `{{` and end with `}}`. For example, a phone number may be represented: `({{999}}) {{999}}-{{999}}`
 
 
 Examples / Demos

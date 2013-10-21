@@ -3,14 +3,24 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     jshint: {
-      all: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js', 'test/**/**/*.js'],
+      all: [
+        'Gruntfile.js',
+        'src/**/*.js',
+        'test/**/*.js',
+        'test/**/**/*.js'
+      ],
       options: {
+        ignores: [
+          'src/tmpls/intro.js',
+          'src/tmpls/outro.js',
+          'src/tmpls/jquery.intro.js',
+          'src/tmpls/jquery.outro.js'
+        ],
         force: true,
         // Bad line breaking before '?'.
         '-W014': true,
         // Expected a conditional expression and instead saw an assignment.
-        '-W084': true,
-        ignores: ['src/intro.js', 'src/outro.js']
+        '-W084': true
       }
     },
     concat: {
@@ -22,9 +32,7 @@ module.exports = function(grunt) {
           ' *\n' +
           ' * thanks to digitalBush/jquery.maskedinput for some of the trickier\n' +
           ' * keycode handling\n' +
-          ' */ \n\n' +
-          ' (function () {\n\n',
-        footer: '\n\n})();',
+          ' */ \n\n',
         process: function(src, filepath) {
           // Remove contents between Exclude Start and Exclude End
           src = src.replace( /\/\*\s*ExcludeStart\s*\*\/[\w\W]*?\/\*\s*ExcludeEnd\s*\*\//ig, '');
@@ -37,12 +45,25 @@ module.exports = function(grunt) {
       },
       vanilla: {
         src: [
+          'src/tmpls/intro.js',
           'src/formatter.js',
           'src/pattern.js',
           'src/inpt-sel.js',
-          'src/utils.js'
+          'src/utils.js',
+          'src/tmpls/outro.js'
         ],
         dest: 'lib/formatter.js'
+      },
+      jquery: {
+        src: [
+          'src/tmpls/jquery.intro.js',
+          'src/formatter.js',
+          'src/pattern.js',
+          'src/inpt-sel.js',
+          'src/utils.js',
+          'src/tmpls/jquery.outro.js'
+        ],
+        dest: 'lib/jquery.formatter.js'
       }
     },
     uglify: {
@@ -52,6 +73,10 @@ module.exports = function(grunt) {
       vanilla: {
         src: 'lib/formatter.js',
         dest: 'lib/formatter.min.js'
+      },
+      jquery: {
+        src: 'lib/jquery.formatter.js',
+        dest: 'lib/jquery.formatter.min.js'
       }
     }
   });
