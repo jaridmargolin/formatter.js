@@ -266,11 +266,14 @@ Formatter.prototype._validateInpts = function () {
 
     // If improper type, or char doesnt match, remove
     if (!inptRegs[inptType] || !inptRegs[inptType].test(this.val[i])) {
-      this.val = utils.removeChars(this.val, i, i + 1);
-      this.focusStart--;
-      this.newPos--;
-      this.delta--;
-      i--;
+      // Check bounds
+      if (this.inpts[i]) {
+        this.val = utils.removeChars(this.val, i, i + 1);
+        this.focusStart--;
+        this.newPos--;
+        this.delta--;
+        i--;
+      }
     }
   }
 };
