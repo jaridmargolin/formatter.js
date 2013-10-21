@@ -29,7 +29,7 @@ module.exports = function(grunt) {
           // Remove contents between Exclude Start and Exclude End
           src = src.replace( /\/\*\s*ExcludeStart\s*\*\/[\w\W]*?\/\*\s*ExcludeEnd\s*\*\//ig, '');
           // Rewrite module.exports to local var
-          sr = src.replace(/module.exports =/g, 'var');
+          src = src.replace(/module.exports\s=/g, 'var');
           // Return final
           return src;
         },
