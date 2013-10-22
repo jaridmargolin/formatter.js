@@ -11,6 +11,13 @@ Format user input to match a specified pattern
 
 
 
+Demos/Examples
+--------------
+
+[view demo](http://firstopinion.github.io/formatter.js/demos.html)
+
+
+
 Why?
 ----
 
@@ -59,7 +66,7 @@ Opts
 ----
 
 * **pattern** (required): String representing the pattern of your formatted input. User input areas begin with `{{` and end with `}}`. For example, a phone number may be represented: `({{999}}) {{999}}-{{999}}`,
-* **persistent**: [False] Boolean representing if the formatted characters are always visible (persistent), or if they appear as you type.
+* **persistent**: \[False\] Boolean representing if the formatted characters are always visible (persistent), or if they appear as you type.
 
 
 
