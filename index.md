@@ -16,10 +16,17 @@ Format user input to match a specified pattern
 
 
 
+Demos/Examples
+--------------
+
+[view demo](http://firstopinion.github.io/formatter.js/demos.html)
+
+
+
 Why?
 ----
 
-Sometimes it is useful to format user input as they type. Existing libraries lacked proper functionality / felxibility. Formatter was built from the ground up with no dependencies.
+Sometimes it is useful to format user input as they type. Existing libraries lacked proper functionality / felxibility. Formatter was built from the ground up with no dependencies. There is however a jquery wrapper version for quick use.
 
 
 
@@ -33,39 +40,38 @@ On Bower
 Usage
 -----
 
-**Include script tag:**
+### Vanilla Javascript
 
-    <script src="bower_components/formatter/formatter.js">  
-    
+* **uncompressed**: formatter.js
+* **compressed**: formatter.min.js
 
-### new Formatter(el, opts)
-
-* **el** (required): Input element to manipulate
-* **opts** (required): An object holding instance specific options.
-  * **pattern** (required): String representing the pattern of your formatted input. User input areas begin with `{{` and end with `}}`. For example, a phone number may be represented: `({{XXX}}) {{XXX}}-{{XXXX}}`
-  * **persistent** : \[False\] Boolean representing if the formatted characters are always visible (persistent), or if they appear as you type.
-
-
-
-Examples / Demos
-----------------
-
-**Credit Card**: 4242-4242-4242-4242
+#### new Formatter(el, opts)
 
     new Formatter(document.getElementById('credit-input'), {
-        'pattern': '{{9999}}-{{9999}}-{{9999}}-{{9999}}'
+      'pattern': '{{999}}-{{999}}-{{999}}-{{9999}}'
+      'persistent': true
     });
 
-[view demo](http://firstopinion.github.io/formatter.js/demos.html#credit)
 
-**Phone Number**: (802) 415-3411
+### Jquery
 
-    new Formatter(document.getElementById('phone-input'), {
-        'pattern': '({{999}}) {{999}}.{{9999}}'
-        'persistent': true
+* **uncompressed**: jquery.formatter.js
+* **compressed**: jquery.formatter.min.js
+
+#### $(selector).formatter(opts)
+
+    $('#credit-input').formatter({
+      'pattern': '{{999}}-{{999}}-{{999}}-{{9999}}'
+      'persistent': true
     });
 
-[view demo](http://firstopinion.github.io/formatter.js/demos.html#phone)
+
+
+Opts
+----
+
+* **pattern** (required): String representing the pattern of your formatted input. User input areas begin with `{{` and end with `}}`. For example, a phone number may be represented: `({{999}}) {{999}}-{{999}}`,
+* **persistent**: \[False\] Boolean representing if the formatted characters are always visible (persistent), or if they appear as you type.
 
 
 
@@ -80,18 +86,6 @@ Run Tests:
     
     npm test
 
-
-
-Todos
------
-
-* Selenium Tests (browserstack or saucelabs)
-* Break out into src files & create build script
-
-Known Issues
-------------
-
-* Some patterns break the regex (should escape str before running)
 
 
 License

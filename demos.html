@@ -14,7 +14,10 @@ layout: master
   </div>
 </div>
 <pre><code>new Formatter(document.getElementById('credit-input'), {
-    'pattern': '{{9999}}-{{9999}}-{{9999}}-{{9999}}'
+  'pattern': '{{9999}}-{{9999}}-{{9999}}-{{9999}}'
+});</code></pre>
+<pre><code>$('#credit-input').formatter({
+  'pattern': '{{9999}}-{{9999}}-{{9999}}-{{9999}}'
 });</code></pre>
 
 <h2 id="phone">Phone Number</h2>
@@ -25,8 +28,11 @@ layout: master
   </div>
 </div>
 <pre><code>new Formatter(document.getElementById('phone-input'), {
-    'pattern': '({{999}}) {{999}}.{{9999}}',
-    'persistent': true
+  'pattern': '({{999}}) {{999}}.{{9999}}',
+  'persistent': true
+});</code></pre>
+<pre><code>$('#phone-input').formatter({
+  'pattern': '({{999}}) {{999}}-{{9999}}'
 });</code></pre>
 
 {% endraw %}

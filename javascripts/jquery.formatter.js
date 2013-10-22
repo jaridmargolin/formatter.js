@@ -7,10 +7,7 @@
  * keycode handling
  */ 
 
-;(function (window, document, undefined) {
-
-// Expose to window
-if (typeof window !== 'undefined') { window.Formatter = Formatter; }
+;(function ($, window, document, undefined) {
 
 // Defaults
 var defaults = {
@@ -32,6 +29,7 @@ var inptRegs = {
 // attaching the event listener to the element.
 //
 function Formatter(el, opts) {
+  console.log(el);
   // Cache this
   var self = this;
 
@@ -546,5 +544,16 @@ utils.isDelKey = function (k) {
 utils.isModifier = function (evt) {
   return evt.ctrlKey || evt.altKey || evt.metaKey;
 };
+// A really lightweight plugin wrapper around the constructor, 
+// preventing against multiple instantiations
+var pluginName = 'formatter';
+$.fn[pluginName] = function (options) {
+  return this.each(function () {
+    if (!$.data(this, 'plugin_' + pluginName)) {
+      $.data(this, 'plugin_' + pluginName, 
+      new Formatter(this, options));
+    }
+  });
+};
 
-})(window, document);
+})( jQuery, window, document);

@@ -38,10 +38,18 @@
 
       </section>
     </div>
+    <script src="http://code.jquery.com/jquery-1.10.1.js"></script>
     <script src="javascripts/scale.fix.js"></script>
     <script src="javascripts/formatter.js"></script>
     {% raw %}
     <script>
+      // $('#phone-input').formatter({
+      //   'pattern': '({{999}}) {{999}}.{{9999}}',
+      //   'persistent': true
+      // });
+      // $('#credit-input').formatter({
+      //   'pattern': '{{9999}}-{{9999}}-{{9999}}-{{9999}}'
+      // });
       var creditInput = document.getElementById('credit-input');
       if (creditInput) {
         new Formatter(creditInput, {
