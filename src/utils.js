@@ -81,8 +81,19 @@ utils.isDelKey = function (k) {
 //
 // Returns true/false if k is an arrow key
 //
-utils.isArrowKey = function (k) {
-  return k === 37 || k === 38 || k === 39 || k === 40;
+utils.isSpecialKey = function (k) {
+  var codes = {
+    '35': 'end',
+    '36': 'home',
+    '37': 'leftarrow',
+    '38': 'uparrow',
+    '39': 'rightarrow',
+    '40': 'downarrow'
+  };
+  // If del or special key
+  return (this.isDelKey(k) || codes[k])
+    ? true
+    : false;
 };
 
 //

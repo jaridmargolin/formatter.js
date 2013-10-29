@@ -83,8 +83,13 @@ describe('formatter.js', function () {
     assert.equal(formatted.focus, 11);
   });
 
-  it('Should not manually handle arrow keys', function () {
+  it('Should natively handle home, end, and arrow keys', function () {
     user.key('leftarrow');
+    user.key('rightarrow');
+    user.key('uparrow');
+    user.key('downarrow');
+    user.key('home');
+    user.key('end');
     assert.equal(formatted.focus, 11);
   });
 
@@ -108,6 +113,18 @@ describe('formatter.js', function () {
       assert.equal(formatted.el.value, '(123) 456-7890');
       done();
     });
+  });
+
+  it('Should remove previous character on backspace key', function () {
+    sel = { begin: 2, end: 2 };
+    user.key('backspace');
+    assert.equal(formatted.el.value, '(234) 567-890 ');
+  });
+
+  it('Should remove next character on delete key', function () {
+    sel = { begin: 2, end: 2 };
+    user.key('delete');
+    assert.equal(formatted.el.value, '(245) 678-90  ');
   });
 
 });
