@@ -70,7 +70,10 @@ Usage
 Opts
 ----
 
-* **pattern** (required): String representing the pattern of your formatted input. User input areas begin with `{{` and end with `}}`. For example, a phone number may be represented: `({{999}}) {{999}}-{{999}}`,
+* **pattern** (required): String representing the pattern of your formatted input. User input areas begin with `{{` and end with `}}`. For example, a phone number may be represented: `({{999}}) {{999}}-{{999}}`. You can specify numbers, letters, or numbers and letters.
+  * 9: \[0-9\]
+  * a: \[A-Za-z\]
+  * \*: \[A-Za-z0-9\]
 * **persistent**: \[False\] Boolean representing if the formatted characters are always visible (persistent), or if they appear as you type.
 
 
