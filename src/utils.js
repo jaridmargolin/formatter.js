@@ -91,9 +91,7 @@ utils.isSpecialKey = function (k) {
     '40': 'downarrow'
   };
   // If del or special key
-  return (this.isDelKey(k) || codes[k])
-    ? true
-    : false;
+  return codes[k];
 };
 
 //

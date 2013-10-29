@@ -26,7 +26,7 @@ var fixChar = function (char) {
 // Method to get key press obj
 //
 keys.getPress = function (char) {
-  return keys.down[fixChar(char)];
+  return keys.press[fixChar(char)];
 };
 
 //

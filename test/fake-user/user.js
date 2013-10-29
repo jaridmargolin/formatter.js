@@ -38,13 +38,13 @@ User.prototype.key = function (char, opts) {
   // If no opts passed, create blank obj
   if (!opts) { opts = {}; }
 
-  if (keyPress.which || keyPress.keyCode) {
+  if (keyPress) {
     opts.which = keyPress.which;
     opts.keyCode = keyPress.keyCode;
     opts.shiftKey = keyPress.shiftKey;
     this.emit('keypress', new events.KeyEvent(opts));
   }
-  if (keyDown.which || keyDown.keyCode) {
+  if (keyDown.which) {
     opts.which = keyDown.which;
     opts.keyCode = keyDown.keyCode;
     opts.shiftKey = keyDown.shiftKey;
