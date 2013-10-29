@@ -115,10 +115,17 @@ Formatter.prototype._keyDown = function (evt) {
 //
 Formatter.prototype._keyPress = function (evt) {
   // The first thing we need is the character code
-  var k = evt.which || evt.keyCode;
+  var k, isArrow;
+  if (evt.which) {
+    k = evt.which;
+  } else {
+    k = evt.keyCode;
+    // Mozilla triggers keypress on arrow keys (fix)
+    isArrow = utils.isArrowKey(k);
+  }
 
   // Process the keyCode and prevent default
-  if (!utils.isDelKey(k) && !utils.isModifier(evt)) {
+  if (!isArrow && !utils.isDelKey(k) && !utils.isModifier(evt)) {
     this._processKey(String.fromCharCode(k), false);
     return utils.preventDefault(evt);
   }

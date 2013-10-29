@@ -79,6 +79,13 @@ utils.isDelKey = function (k) {
 };
 
 //
+// Returns true/false if k is an arrow key
+//
+utils.isArrowKey = function (k) {
+  return k === 37 || k === 38 || k === 39 || k === 40;
+};
+
+//
 // Returns true/false if modifier key is held down
 //
 utils.isModifier = function (evt) {

@@ -83,6 +83,11 @@ describe('formatter.js', function () {
     assert.equal(formatted.focus, 11);
   });
 
+  it('Should not manually handle arrow keys', function () {
+    user.key('leftarrow');
+    assert.equal(formatted.focus, 11);
+  });
+
   it('Should fromat chars entered mid str', function (done) {
     sel = { begin: 6, end: 6 };
     user.keySeq('456', function () {

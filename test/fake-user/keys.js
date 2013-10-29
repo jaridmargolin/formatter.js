@@ -26,14 +26,33 @@ var fixChar = function (char) {
 // Method to get key press obj
 //
 keys.getPress = function (char) {
-  return keys.press[fixChar(char)];
+  // Get key obj
+  var key = keys.down[fixChar(char)];
+  // Mozilla assigns 0 to which and 37-40 to keyCode
+  // on arrow keys. We need to adjust for this
+  if (char == 'leftarrow' || char == 'rightarrow' || char == 'uparrow' || char == 'downarrow') {
+    key.which = 0;
+  }
+  // Return obj
+  return {
+    which: key.which,
+    keyCode: key.code,
+    shiftKey: key.shiftKey
+  };
 };
 
 //
 // Method to get key down obj
 //
 keys.getDown = function (char) {
-  return keys.down[fixChar(char)];
+  // Get key obj
+  var key = keys.down[fixChar(char)];
+  // Return obj
+  return {
+    which: key.code,
+    keyCode: key.code,
+    shiftKey: key.shiftKey
+  };
 };
 
 
@@ -133,7 +152,12 @@ keys.press = {
   "{": { "code": 123, "shiftKey": true },
   "|": { "code": 124, "shiftKey": true },
   "}": { "code": 125, "shiftKey": true },
-  "~": { "code": 126, "shiftKey": true }
+  "~": { "code": 126, "shiftKey": true },
+  /* Mozilla Specific */
+  "leftarrow": { "code": 37, "shiftKey": false },
+  "uparrow": { "code": 38, "shiftKey": false },
+  "rightarrow": { "code": 39, "shiftKey": false },
+  "downarrow": { "code": 40, "shiftKey": false }
 };
 
 // Down obj
