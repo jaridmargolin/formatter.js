@@ -48,7 +48,7 @@ Usage
 #### new Formatter(el, opts)
 
     new Formatter(document.getElementById('credit-input'), {
-      'pattern': '{{999}}-{{999}}-{{999}}-{{9999}}'
+      'pattern': '{{999}}-{{999}}-{{999}}-{{9999}}',
       'persistent': true
     });
 
@@ -61,7 +61,7 @@ Usage
 #### $(selector).formatter(opts)
 
     $('#credit-input').formatter({
-      'pattern': '{{999}}-{{999}}-{{999}}-{{9999}}'
+      'pattern': '{{999}}-{{999}}-{{999}}-{{9999}}',
       'persistent': true
     });
 
