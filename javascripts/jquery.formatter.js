@@ -98,7 +98,7 @@ Formatter.prototype._keyDown = function (evt) {
   // If delete key
   if (k && utils.isDelKey(k)) {
     // Process the keyCode and prevent default
-    this._processKey(null, true);
+    this._processKey(null, k);
     return utils.preventDefault(evt);
   }
 };
@@ -110,17 +110,17 @@ Formatter.prototype._keyDown = function (evt) {
 //
 Formatter.prototype._keyPress = function (evt) {
   // The first thing we need is the character code
-  var k, isArrow;
+  var k, isSpecial;
+  // Mozilla will trigger on special keys and assign the the value 0
+  // We want to use that 0 rather than the keyCode it assigns.
   if (evt.which) {
     k = evt.which;
   } else {
     k = evt.keyCode;
-    // Mozilla triggers keypress on arrow keys (fix)
-    isArrow = utils.isArrowKey(k);
+    isSpecial = utils.isSpecialKey(k);
   }
-
   // Process the keyCode and prevent default
-  if (!isArrow && !utils.isDelKey(k) && !utils.isModifier(evt)) {
+  if (!utils.isDelKey(k) && !isSpecial && !utils.isModifier(evt)) {
     this._processKey(String.fromCharCode(k), false);
     return utils.preventDefault(evt);
   }
@@ -160,7 +160,7 @@ Formatter.prototype._focus = function (evt) {
 // @private
 // Using the provided key information, alter el value.
 //
-Formatter.prototype._processKey = function (chars, isDelKey) {
+Formatter.prototype._processKey = function (chars, delKey) {
   // Get current state
   this.sel = inptSel.get(this.el);
   this.val = this.el.value;
@@ -172,16 +172,32 @@ Formatter.prototype._processKey = function (chars, isDelKey) {
   if (this.sel.begin !== this.sel.end) {
     this.delta = (-1) * Math.abs(this.sel.begin - this.sel.end);
     this.val   = utils.removeChars(this.val, this.sel.begin, this.sel.end);
-
-  // If pressed key is a del key, and the caret pos is not at start,
-  // remove at caret pos
-  } else if (isDelKey && this.sel.begin - 1 >= 0) {
-    this.val = utils.removeChars(this.val, this.sel.end -1, this.sel.end);
-    this.delta = -1;
+  }
+  // If delKey
+  else if (delKey) {
+    // Delete
+    if (delKey && delKey == 46) {
+      // Adjust focus to make sure its not on a formatted char
+      while (this.chars[this.sel.begin]) {
+        this._nextPos();
+      }
+      // As long as we are not at the end
+      if (this.sel.begin < this.val.length) {
+        // We will simulate a delete by moving the caret to the next char
+        // and then deleting
+        this._nextPos();
+        this.val = utils.removeChars(this.val, this.sel.end -1, this.sel.end);
+        this.delta = -1;
+      }
+    // or Backspace and not at start
+    } else if (delKey && this.sel.begin - 1 >= 0) {
+      this.val = utils.removeChars(this.val, this.sel.end -1, this.sel.end);
+      this.delta = -1;
+    }
   }
 
   // If the key is not a del key, it should convert to a str
-  if (!isDelKey) {
+  if (!delKey) {
     // Add char at position and increment delta
     this.val = utils.addChars(this.val, chars, this.sel.begin);
     this.delta += chars.length;
@@ -189,6 +205,15 @@ Formatter.prototype._processKey = function (chars, isDelKey) {
 
   // Format el.value (also handles updating caret position)
   this._formatValue();
+};
+
+//
+// @private
+// Quick helper method to move the caret to the next pos
+//
+Formatter.prototype._nextPos = function () {
+  this.sel.end ++;
+  this.sel.begin ++;
 };
 
 //
@@ -547,8 +572,17 @@ utils.isDelKey = function (k) {
 //
 // Returns true/false if k is an arrow key
 //
-utils.isArrowKey = function (k) {
-  return k === 37 || k === 38 || k === 39 || k === 40;
+utils.isSpecialKey = function (k) {
+  var codes = {
+    '35': 'end',
+    '36': 'home',
+    '37': 'leftarrow',
+    '38': 'uparrow',
+    '39': 'rightarrow',
+    '40': 'downarrow'
+  };
+  // If del or special key
+  return codes[k];
 };
 
 //
