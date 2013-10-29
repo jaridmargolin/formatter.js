@@ -1,5 +1,5 @@
 /*!
- * v0.0.3
+ * v0.0.4
  * Copyright (c) 2013 First Opinion
  * formatter.js is open sourced under the MIT license.
  *
@@ -29,7 +29,6 @@ var inptRegs = {
 // attaching the event listener to the element.
 //
 function Formatter(el, opts) {
-  console.log(el);
   // Cache this
   var self = this;
 
@@ -111,10 +110,17 @@ Formatter.prototype._keyDown = function (evt) {
 //
 Formatter.prototype._keyPress = function (evt) {
   // The first thing we need is the character code
-  var k = evt.which || evt.keyCode;
+  var k, isArrow;
+  if (evt.which) {
+    k = evt.which;
+  } else {
+    k = evt.keyCode;
+    // Mozilla triggers keypress on arrow keys (fix)
+    isArrow = utils.isArrowKey(k);
+  }
 
   // Process the keyCode and prevent default
-  if (!utils.isDelKey(k) && !utils.isModifier(evt)) {
+  if (!isArrow && !utils.isDelKey(k) && !utils.isModifier(evt)) {
     this._processKey(String.fromCharCode(k), false);
     return utils.preventDefault(evt);
   }
@@ -536,6 +542,13 @@ utils.getClip = function (evt) {
 //
 utils.isDelKey = function (k) {
   return k === 8 || k === 46 || (iPhone && k === 127);
+};
+
+//
+// Returns true/false if k is an arrow key
+//
+utils.isArrowKey = function (k) {
+  return k === 37 || k === 38 || k === 39 || k === 40;
 };
 
 //
