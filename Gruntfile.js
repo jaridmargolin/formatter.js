@@ -1,5 +1,7 @@
 module.exports = function(grunt) {
 
+  require('load-grunt-tasks')(grunt);
+
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     jshint: {
@@ -81,11 +83,6 @@ module.exports = function(grunt) {
     }
   });
 
-  // Load plugins
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-
-  // Tasks    
+  // Tasks
   grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
 };
