@@ -42,7 +42,7 @@ Usage
 
 #### new Formatter(el, opts)
 
-    new Formatter(document.getElementById('credit-input'), {
+    var formatted = new Formatter(document.getElementById('credit-input'), {
       'pattern': '{{999}}-{{999}}-{{999}}-{{9999}}',
       'persistent': true
     });
@@ -60,6 +60,26 @@ Usage
       'persistent': true
     });
 
+
+
+Methods
+-------
+
+#### resetPattern(pattern)
+
+Fairly self explanatory here :) reset the pattern on an existing Formatter instance.
+
+**Vanilla Javascript**
+
+(assuming you already created a new instance and saved it to the var `formatted`)
+
+    formatted.resetPattern('{{999}}.{{999}}.{{9999}}');
+
+**Jquery**
+
+(assuming you already initiated formatter on `#selector`)
+
+    $('#selector').formatter().resetPattern();
 
 
 Opts

@@ -127,4 +127,8 @@ describe('formatter.js', function () {
     assert.equal(formatted.el.value, '(245) 678-90  ');
   });
 
+  it('Should update value when resetPattern method is called', function () {
+    formatted.resetPattern('{{999}}.{{999}}.{{9999}}');
+    assert.equal(formatted.el.value, '245.678.90  ');
+  });
 });
