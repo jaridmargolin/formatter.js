@@ -1,5 +1,5 @@
 /*!
- * v0.0.4
+ * v0.0.5
  * Copyright (c) 2013 First Opinion
  * formatter.js is open sourced under the MIT license.
  *
@@ -266,7 +266,7 @@ Formatter.prototype._removeChars = function () {
 
     // If after selection we need to account for delta
     pos = (i >= this.sel.begin) ? pos + this.delta : pos;
-    val = this.val[pos];
+    val = this.val.charAt(pos);
     // Remove char and account for shift
     if (curChar && curChar == val || curHldr && curHldr == val) {
       this.val = utils.removeChars(this.val, pos, pos + 1);
@@ -292,7 +292,7 @@ Formatter.prototype._validateInpts = function () {
     var inptType = this.inpts[i];
 
     // If improper type, or char doesnt match, remove
-    if (!inptRegs[inptType] || !inptRegs[inptType].test(this.val[i])) {
+    if (!inptRegs[inptType] || !inptRegs[inptType].test(this.val.charAt(i))) {
       // Check bounds
       if (this.inpts[i]) {
         this.val = utils.removeChars(this.val, i, i + 1);
@@ -313,7 +313,7 @@ Formatter.prototype._addChars = function () {
   if (this.opts.persistent) { 
     // Loop over all possible characters
     for (var i = 0; i <= this.mLength; i++) {
-      if (!this.val[i]) {
+      if (!this.val.charAt(i)) {
         // Add placeholder at pos
         this.val = utils.addChars(this.val, this.opts.placeholder, i);
         this.hldrs[i] = this.opts.placeholder;
@@ -356,7 +356,7 @@ Formatter.prototype._addChar = function (i) {
 
   // When moving backwards there are some race conditions where we
   // dont want to add the character
-  if (this.delta < 0 && (this.val[i] == char )) { return true; }
+  if (this.delta < 0 && (this.val.charAt(i) == char )) { return true; }
 
   // Updateholder
   if (this.hldrs[i]) {
@@ -411,7 +411,7 @@ pattern.parse = function (pattern) {
   var processMatch = function (val) {
     var valLength = val.length;
     for (var j = 0; j < valLength; j++) {
-      info.inpts[iCount] = val[j];
+      info.inpts[iCount] = val.charAt(j);
       iCount++;
     }
     mCount ++;
@@ -423,7 +423,7 @@ pattern.parse = function (pattern) {
     if (i == matches[mCount].index) {
       processMatch(matches[mCount][1]);
     } else {
-      info.chars[i - (mCount * DELIM_SIZE)] = pattern[i];
+      info.chars[i - (mCount * DELIM_SIZE)] = pattern.charAt(i);
     }
   }
 
