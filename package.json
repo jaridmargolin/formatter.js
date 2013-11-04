@@ -17,7 +17,8 @@
     "grunt": "~0.4.1",
     "mocha": "~1.9.0",
     "sinon": "~1.7.3",
-    "chai": "~1.6.0"
+    "chai": "~1.6.0",
+    "load-grunt-tasks": "~0.1.0"
   },
   "license": "MIT"
 }
