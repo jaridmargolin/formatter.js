@@ -49,7 +49,7 @@ pattern.parse = function (pattern) {
   var processMatch = function (val) {
     var valLength = val.length;
     for (var j = 0; j < valLength; j++) {
-      info.inpts[iCount] = val[j];
+      info.inpts[iCount] = val.charAt(j);
       iCount++;
     }
     mCount ++;
@@ -61,7 +61,7 @@ pattern.parse = function (pattern) {
     if (i == matches[mCount].index) {
       processMatch(matches[mCount][1]);
     } else {
-      info.chars[i - (mCount * DELIM_SIZE)] = pattern[i];
+      info.chars[i - (mCount * DELIM_SIZE)] = pattern.charAt(i);
     }
   }
 
