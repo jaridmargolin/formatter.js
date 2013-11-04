@@ -47,7 +47,7 @@ Usage
 
 #### new Formatter(el, opts)
 
-    new Formatter(document.getElementById('credit-input'), {
+    var formatted = new Formatter(document.getElementById('credit-input'), {
       'pattern': '{{999}}-{{999}}-{{999}}-{{9999}}',
       'persistent': true
     });
@@ -67,13 +67,33 @@ Usage
 
 
 
+Methods
+-------
+
+#### resetPattern(pattern)
+
+Fairly self explanatory here :) reset the pattern on an existing Formatter instance.
+
+**Vanilla Javascript**
+
+(assuming you already created a new instance and saved it to the var `formatted`)
+
+    formatted.resetPattern('{{999}}.{{999}}.{{9999}}');
+
+**Jquery**
+
+(assuming you already initiated formatter on `#selector`)
+
+    $('#selector').formatter().resetPattern();
+
+
 Opts
 ----
 
 * **pattern** (required): String representing the pattern of your formatted input. User input areas begin with `{{` and end with `}}`. For example, a phone number may be represented: `({{999}}) {{999}}-{{999}}`. You can specify numbers, letters, or numbers and letters.
-  * 9: \[0-9\]
-  * a: \[A-Za-z\]
-  * \*: \[A-Za-z0-9\]
+  * 9: [0-9]
+  * a: [A-Za-z]
+  * \*: [A-Za-z0-9] 
 * **persistent**: \[False\] Boolean representing if the formatted characters are always visible (persistent), or if they appear as you type.
 
 

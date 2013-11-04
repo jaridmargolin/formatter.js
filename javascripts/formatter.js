@@ -1,5 +1,5 @@
 /*!
- * v0.0.5
+ * v0.0.6
  * Copyright (c) 2013 First Opinion
  * formatter.js is open sourced under the MIT license.
  *
@@ -73,7 +73,7 @@ function Formatter(el, opts) {
   // Persistence
   if (self.opts.persistent) {
     // Format on start
-    self._processKey(null, true);
+    self._processKey('', false);
     self.el.blur();
 
     // Add Listeners
@@ -88,6 +88,32 @@ function Formatter(el, opts) {
     });
   }
 }
+
+//
+// @public
+// Handler called on all keyDown strokes. All keys trigger
+// this handler. Only process delete keys.
+//
+Formatter.prototype.resetPattern = function (str) {
+  // Get current state
+  this.sel = inptSel.get(this.el);
+  this.val = this.el.value;
+
+  // Init values
+  this.delta = 0;
+
+  // Remove all formatted chars from val
+  this._removeChars();
+
+  // Update pattern
+  var parsed   = pattern.parse(str);
+  this.mLength = parsed.mLength;
+  this.chars   = parsed.chars;
+  this.inpts   = parsed.inpts;
+
+  // Format on start
+  this._processKey('', false);
+};
 
 //
 // @private
@@ -226,8 +252,7 @@ Formatter.prototype._nextPos = function () {
 //
 Formatter.prototype._formatValue = function () {
   // Set caret pos
-  this.curPos = this.sel.end;
-  this.newPos = this.curPos + this.delta;
+  this.newPos = this.sel.end + this.delta;
 
   // Remove all formatted chars from val
   this._removeChars();
