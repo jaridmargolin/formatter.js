@@ -26,7 +26,7 @@ Demos/Examples
 Why?
 ----
 
-Sometimes it is useful to format user input as they type. Existing libraries lacked proper functionality / felxibility. Formatter was built from the ground up with no dependencies. There is however a jquery wrapper version for quick use.
+Sometimes it is useful to format user input as they type. Existing libraries lacked proper functionality / flexibility. Formatter was built from the ground up with no dependencies. There is however a jquery wrapper version for quick use.
 
 
 
