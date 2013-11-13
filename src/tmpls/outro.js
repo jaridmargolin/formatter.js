@@ -1,2 +1,3 @@
+return Formatter;
 
-})(window, document);
+});

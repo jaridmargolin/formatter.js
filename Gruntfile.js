@@ -34,10 +34,12 @@ module.exports = function(grunt) {
           ' * keycode handling\n' +
           ' */ \n\n',
         process: function(src, filepath) {
-          // Remove contents between Exclude Start and Exclude End
-          src = src.replace( /\/\*\s*ExcludeStart\s*\*\/[\w\W]*?\/\*\s*ExcludeEnd\s*\*\//ig, '');
-          // Rewrite module.exports to local var
-          src = src.replace(/module.exports\s=/g, 'var');
+          if (!/tmpls\/.*\.js/.test(filepath)) {
+            // Remove contents between Exclude Start and Exclude End
+            src = src.replace( /\/\*\s*ExcludeStart\s*\*\/[\w\W]*?\/\*\s*ExcludeEnd\s*\*\//ig, '');
+            // Rewrite module.exports to local var
+            src = src.replace(/module.exports\s=/g, 'var');
+          }
           // Return final
           return src;
         },
