@@ -260,8 +260,10 @@ Formatter.prototype._formatValue = function () {
   this._removeChars();
   // Validate inpts
   this._validateInpts();
-  // Add formatted characters
-  this._addChars();
+  if (this.newPos > 0 || this.opts.persistent) {
+    // Add formatted characters
+    this._addChars();
+  }
 
   // Set vakye and adhere to maxLength 
   this.el.value = this.val.substr(0, this.mLength);
