@@ -23,9 +23,9 @@ var defaults = {
 
 // Regexs for input validation
 var inptRegs = {
-  '9': new RegExp('[0-9]'),
-  'a': new RegExp('[A-Za-z]'),
-  '*': new RegExp('[A-Za-z0-9]')
+  '9': /[0-9]/,
+  'a': /[A-Za-z]/,
+  '*': /[A-Za-z0-9]/
 };
 
 //
