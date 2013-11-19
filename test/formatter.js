@@ -111,6 +111,13 @@ describe('formatter.js', function () {
         });
       });
     });
+
+    it('Should enforce pattern maxLength', function (done) {
+      user.keySeq('12345678901', function () {
+        assert.equal(formatted.el.value, '(123) 456-7890');
+        done();
+      });
+    });
   });
 
 

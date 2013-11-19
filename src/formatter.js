@@ -335,7 +335,7 @@ Formatter.prototype._validateInpts = function () {
 
     // Checks
     var isBadType = !inptRegs[inptType],
-        isInvalid = !inptRegs[inptType].test(this.val.charAt(i)),
+        isInvalid = !isBadType && !inptRegs[inptType].test(this.val.charAt(i)),
         inBounds  = this.inpts[i];
 
     // Remove if incorrect and inbounds
