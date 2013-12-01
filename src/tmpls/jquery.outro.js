@@ -29,4 +29,9 @@ $.fn[pluginName] = function (options) {
   return this;
 };
 
+$.fn[pluginName].addInptType = function (char, regexp) {
+  Formatter.addInptType(char, regexp);
+};
+
+
 })( jQuery, window, document);

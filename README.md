@@ -73,8 +73,25 @@ Opts
 
 
 
-Methods
--------
+Class Methods
+-------------
+
+#### addInptType(char, regexp)
+
+Add regular expressions for different input types.
+
+**Vanilla Javascript**
+
+    Formatter.addInptType('L', /[A-Z]/);
+
+**Jquery**
+
+    $.fn.formatter.addInptType('L', /[A-Z]/);
+
+
+
+Instance Methods
+----------------
 
 #### resetPattern(pattern)
 
