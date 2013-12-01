@@ -58,15 +58,16 @@ describe('formatter.js', function () {
   // Formatter global tests
   //
   describe('global', function () {
-    beforeEach(function () {
-      // New instance
+    // Create new instance
+    var createInstance = function (str) {
       formatted = new Formatter(el, {
-        pattern: '({{999}}) {{999}}-{{9999}}',
+        pattern: str,
         persistent: true
       });
-    });
+    };
 
     it('Should set init values and merge defaults', function () {
+      createInstance('({{999}}) {{999}}-{{9999}}');
       // Check opts
       assert.equal(formatted.opts.pattern, '({{999}}) {{999}}-{{9999}}');
       assert.isTrue(formatted.opts.persistent);
@@ -80,6 +81,7 @@ describe('formatter.js', function () {
     });
 
     it('Should natively handle home, end, and arrow keys', function () {
+      createInstance('({{999}}) {{999}}-{{9999}}');
       user.key('leftarrow');
       user.key('rightarrow');
       user.key('uparrow');
@@ -90,6 +92,7 @@ describe('formatter.js', function () {
     });
 
     it('Should update value when resetPattern method is called', function (done) {
+      createInstance('({{999}}) {{999}}-{{9999}}');
       user.keySeq('24567890', function () {
         formatted.resetPattern('{{999}}.{{999}}.{{9999}}');
         assert.equal(formatted.el.value, '245.678.90  ');
@@ -99,12 +102,14 @@ describe('formatter.js', function () {
 
     describe('input focus', function () {
       it('Should focus to the next available inpt position', function (done) {
+        createInstance('({{999}}) {{999}}-{{9999}}');
         user.keySeq('1237890', function () {
           assert.equal(formatted.focus, 11);
           done();
         });
       });
       it('Should not focus on a formatted char', function (done) {
+        createInstance('({{999}}) {{999}}-{{9999}}');
         user.keySeq('123', function () {
           assert.equal(formatted.focus, 6);
           done();
@@ -113,8 +118,18 @@ describe('formatter.js', function () {
     });
 
     it('Should enforce pattern maxLength', function (done) {
+      createInstance('({{999}}) {{999}}-{{9999}}');
       user.keySeq('12345678901', function () {
         assert.equal(formatted.el.value, '(123) 456-7890');
+        done();
+      });
+    });
+
+    it('Should add regex inpts', function (done) {
+      Formatter.addInptType('L', /[A-Z]/);
+      createInstance('{{LLL}}');
+      user.keySeq('AaAaA', function () {
+        assert.equal(formatted.el.value, 'AAA');
         done();
       });
     });
