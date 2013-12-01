@@ -88,6 +88,8 @@ describe('formatter.js', function () {
       user.key('downarrow');
       user.key('home');
       user.key('end');
+      user.key('enter');
+      user.key('tab');
       assert.equal(formatted.focus, 1);
     });
 
