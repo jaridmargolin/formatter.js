@@ -106,9 +106,8 @@ Formatter.addInptType = function (char, reg) {
 //
 Formatter.prototype.resetPattern = function (str) {
   // Update opts to hold new pattern
-  if (str) {
-    this.opts.pattern = str;
-  }
+  str = str || this.opts.pattern;
+  this.opts.pattern = str;
   
   // Get current state
   this.sel = inptSel.get(this.el);
