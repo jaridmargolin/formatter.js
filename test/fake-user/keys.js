@@ -4,7 +4,7 @@
  * (C) 2013 First Opinion
  * MIT LICENCE
  *
- */
+ */ 
 
 module.exports = keys = {};
 
@@ -13,27 +13,27 @@ module.exports = keys = {};
 // Helper method to fix characters that cannot
 // be store as a json key
 //
-var fixChar = function (chr) {
-  if (chr == '"') {
-    chr = 'doublequote';
-  } else if (chr == "\\") {
-    chr = 'forwardslash';
+var fixChar = function (char) {
+  if (char == '"') {
+    char = 'doublequote';
+  } else if (char == "\\") {
+    char = 'forwardslash';
   }
-  return chr;
+  return char;
 };
 
 //
 // Method to get key press obj
 //
-keys.getPress = function (chr) {
-  return keys.press[fixChar(chr)];
+keys.getPress = function (char) {
+  return keys.press[fixChar(char)];
 };
 
 //
 // Method to get key down obj
 //
-keys.getDown = function (chr) {
-  return keys.down[fixChar(chr)];
+keys.getDown = function (char) {
+  return keys.down[fixChar(char)];
 };
 
 
