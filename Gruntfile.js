@@ -18,6 +18,7 @@ module.exports = function(grunt) {
           'src/tmpls/jquery.intro.js',
           'src/tmpls/jquery.outro.js'
         ],
+        force: true,
         es3: true,
         smarttabs: true,
         // Bad line breaking before '?'.
@@ -92,5 +93,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
   // Tasks
-  grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
+  grunt.registerTask('default', ['concat', 'uglify', 'jshint']);
 };

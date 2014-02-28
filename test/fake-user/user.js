@@ -4,7 +4,7 @@
  * (C) 2013 First Opinion
  * MIT LICENCE
  *
- */ 
+ */
 
 // stdlib
 var EventEmitter = require('events').EventEmitter;
@@ -29,11 +29,11 @@ User.prototype.constructor = User;
 //
 // Mock keyboard input
 //
-User.prototype.key = function (char, opts) {
+User.prototype.key = function (chr, opts) {
   // Determine what we should trigger by looking for
   // existence within keys.press, and keys.down
-  var keyPress = keys.getPress(char),
-      keyDown  = keys.getDown(char);
+  var keyPress = keys.getPress(chr),
+      keyDown  = keys.getDown(chr);
 
   // If no opts passed, create blank obj
   if (!opts) { opts = {}; }

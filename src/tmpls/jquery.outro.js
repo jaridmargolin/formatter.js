@@ -1,4 +1,4 @@
-// A really lightweight plugin wrapper around the constructor, 
+// A really lightweight plugin wrapper around the constructor,
 // preventing against multiple instantiations
 var pluginName = 'formatter';
 
@@ -8,7 +8,7 @@ $.fn[pluginName] = function (options) {
 	if (typeof options == 'object') {
 	  this.each(function () {
 	    if (!$.data(this, 'plugin_' + pluginName)) {
-	      $.data(this, 'plugin_' + pluginName, 
+	      $.data(this, 'plugin_' + pluginName,
 	      new Formatter(this, options));
 	    }
 	  });
@@ -22,16 +22,15 @@ $.fn[pluginName] = function (options) {
       if (formatted) { formatted.resetPattern(str); }
     });
     // Chainable please
-    return this
+    return this;
   };
 
   // Chainable please
   return this;
 };
 
-$.fn[pluginName].addInptType = function (char, regexp) {
-  Formatter.addInptType(char, regexp);
+$.fn[pluginName].addInptType = function (chr, regexp) {
+  Formatter.addInptType(chr, regexp);
 };
-
 
 })( jQuery, window, document);
