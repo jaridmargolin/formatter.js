@@ -293,6 +293,14 @@ describe('formatter.js', function () {
         done();
       });
     });
+ 
+    it('Should update value when resetPattern method is called without changing pattern', function (done) {
+      user.keySeq('2456789013', function () {
+        formatted.resetPattern();
+        assert.equal(formatted.el.value, '(245) 678-9013');
+        done();
+      });
+    });
   });
   
 });
