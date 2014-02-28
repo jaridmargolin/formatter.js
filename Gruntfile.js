@@ -7,7 +7,9 @@ module.exports = function(grunt) {
         'Gruntfile.js',
         'src/**/*.js',
         'test/**/*.js',
-        'test/**/**/*.js'
+        'test/**/**/*.js',
+        'lib/formatter.js',
+        'lib/jquery.formatter.js'
       ],
       options: {
         ignores: [
@@ -17,6 +19,8 @@ module.exports = function(grunt) {
           'src/tmpls/jquery.outro.js'
         ],
         force: true,
+        es3: true,
+        smarttabs: true,
         // Bad line breaking before '?'.
         '-W014': true,
         // Expected a conditional expression and instead saw an assignment.
@@ -88,6 +92,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
-  // Tasks    
+  // Tasks
   grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
 };
