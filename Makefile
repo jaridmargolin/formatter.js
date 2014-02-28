@@ -1,9 +1,11 @@
 MOCHA_OPTS= --check-leaks
 REPORTER = spec
 
-test: 
+test:
 	@NODE_ENV=test ./node_modules/.bin/mocha \
 		--reporter $(REPORTER) \
-		$(MOCHA_OPTS)
-		
+		$(MOCHA_OPTS) && \
+	grunt uglify concat && \
+	grunt jshint
+
 .PHONY: test

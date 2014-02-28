@@ -18,7 +18,6 @@ module.exports = function(grunt) {
           'src/tmpls/jquery.intro.js',
           'src/tmpls/jquery.outro.js'
         ],
-        force: true,
         es3: true,
         smarttabs: true,
         // Bad line breaking before '?'.
