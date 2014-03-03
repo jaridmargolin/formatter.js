@@ -3,21 +3,21 @@
   "version": "0.0.9",
   "description": "Format user input to match a specified pattern",
   "author": "Jarid Margolin <jarid@firstopinion.com>",
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/firstopinion/formatter.js"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/firstopinion/formatter.js"
   },
   "scripts": {
     "test": "make test"
   },
   "devDependencies": {
     "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-uglify": "~0.2.4",
-    "grunt-contrib-jshint": "~0.6.4",
+    "grunt-contrib-uglify": "~0.3.3",
+    "grunt-contrib-jshint": "~0.8.0",
     "grunt": "~0.4.1",
-    "mocha": "~1.9.0",
-    "sinon": "~1.7.3",
-    "chai": "~1.6.0"
+    "mocha": "~1.17.1",
+    "sinon": "~1.8.2",
+    "chai": "~1.9.0"
   },
   "license": "MIT"
 }

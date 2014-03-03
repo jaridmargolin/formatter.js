@@ -301,6 +301,16 @@ describe('formatter.js', function () {
         done();
       });
     });
+
+    it('Should not reset caret position on format', function (done) {
+      user.keySeq('24567890', function () {
+        sel = { begin: 2, end: 2 };
+        formatted.resetPattern();
+        assert.equal(formatted.el.value, '(245) 678-90');
+        assert.deepEqual(sel, inptSel.get());
+        done();
+      });
+    });
   });
   
 });
