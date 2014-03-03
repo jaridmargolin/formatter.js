@@ -47,4 +47,33 @@ describe('pattern.js', function () {
     });
   });
 
+  // Should be able to handle patterns with suffix chars
+  describe('parse', function () {
+    it('Should return an obj with pattern info for a pattern with suffix chars', function () {
+      var result = pattern.parse('({{9A*}}) {{9A*}}-{{AAAA}} ABC');
+      assert.deepEqual(result.chars, {
+        '0': '(',
+        '4': ')',
+        '5': ' ',
+        '9': '-',
+        '14': ' ',
+        '15': 'A',
+        '16': 'B',
+        '17': 'C'
+      });
+      assert.deepEqual(result.inpts, {
+        '0': '9',
+        '1': 'A',
+        '2': '*',
+        '3': '9',
+        '4': 'A',
+        '5': '*',
+        '6': 'A',
+        '7': 'A',
+        '8': 'A',
+        '9': 'A'
+      });
+      assert.equal(result.mLength, 18);
+    });
+  });
 });
