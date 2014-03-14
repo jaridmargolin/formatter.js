@@ -6,7 +6,7 @@
  */
 
 /* ExcludeStart */
-var pattern = require('./pattern'),
+var patternMatcher = require('./pattern-matcher'),
     inptSel = require('./inpt-sel'),
     utils   = require('./utils');
 
@@ -46,16 +46,21 @@ function Formatter(el, opts) {
   // Merge opts with defaults
   self.opts = utils.extend({}, defaults, opts);
 
-  // Make sure we have valid opts
-  if (typeof self.opts.pattern === 'undefined') {
-    throw new TypeError('Must provide a pattern');
+  // 1 pattern is special case
+  if (typeof self.opts.pattern !== 'undefined') {
+    self.opts.patterns = self._specFromSinglePattern(self.opts.pattern);
+    delete self.opts.pattern;
   }
 
-  // Get info about the given pattern
-  var parsed   = pattern.parse(self.opts.pattern);
-  self.mLength = parsed.mLength;
-  self.chars   = parsed.chars;
-  self.inpts   = parsed.inpts;
+  // Make sure we have valid opts
+  if (typeof self.opts.patterns === 'undefined') {
+    throw new TypeError('Must provide a pattern or array of patterns');
+  }
+
+  self.patternMatcher = patternMatcher(self.opts.patterns);
+
+  // Upate pattern with initial value
+  self._updatePattern();
 
   // Init values
   self.hldrs = {};
@@ -105,8 +110,7 @@ Formatter.addInptType = function (chr, reg) {
 //
 Formatter.prototype.resetPattern = function (str) {
   // Update opts to hold new pattern
-  str = str || this.opts.pattern;
-  this.opts.pattern = str;
+  this.opts.patterns = str ? this._specFromSinglePattern(str) : this.opts.patterns;
 
   // Get current state
   this.sel = inptSel.get(this.el);
@@ -118,14 +122,34 @@ Formatter.prototype.resetPattern = function (str) {
   // Remove all formatted chars from val
   this._removeChars();
 
+  this.patternMatcher = patternMatcher(this.opts.patterns);
+
   // Update pattern
-  var parsed   = pattern.parse(str);
-  this.mLength = parsed.mLength;
-  this.chars   = parsed.chars;
-  this.inpts   = parsed.inpts;
+  var newPattern = this.patternMatcher.getPattern(this.val);
+  this.mLength   = newPattern.mLength;
+  this.chars     = newPattern.chars;
+  this.inpts     = newPattern.inpts;
 
   // Format on start
   this._processKey('', false, true);
+};
+
+//
+// @private
+// Determine correct format pattern based on input val
+//
+Formatter.prototype._updatePattern = function () {
+  // Determine appropriate pattern
+  var newPattern = this.patternMatcher.getPattern(this.val);
+
+  // Only update the pattern if there is an appropriate pattern for the value.
+  // Otherwise, leave the current pattern (and likely delete the latest character.)
+  if (newPattern) {
+    // Get info about the given pattern
+    this.mLength = newPattern.mLength;
+    this.chars   = newPattern.chars;
+    this.inpts   = newPattern.inpts;
+  }
 };
 
 //
@@ -281,12 +305,16 @@ Formatter.prototype._formatValue = function (ignoreCaret) {
 
   // Remove all formatted chars from val
   this._removeChars();
+
+  // Switch to first matching pattern based on val
+  this._updatePattern();
+
   // Validate inputs
   this._validateInpts();
   // Add formatted characters
   this._addChars();
 
-  // Set value and adhere to maxLength 
+  // Set value and adhere to maxLength
   this.el.value = this.val.substr(0, this.mLength);
 
   // Set new caret position
@@ -420,3 +448,13 @@ Formatter.prototype._addChar = function (i) {
   // Update value
   this.val = utils.addChars(this.val, chr, i);
 };
+
+//
+// @private
+// Create a patternSpec for passing into patternMatcher that
+// has exactly one catch all pattern.
+//
+Formatter.prototype._specFromSinglePattern = function (patternStr) {
+  return [{ '*': patternStr }];
+};
+

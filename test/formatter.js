@@ -4,7 +4,7 @@
  * (C) 2013 First Opinion
  * MIT LICENCE
  *
- */ 
+ */
 
 // 3rd party
 var restore = require('sinon').restore,
@@ -69,7 +69,7 @@ describe('formatter.js', function () {
     it('Should set init values and merge defaults', function () {
       createInstance('({{999}}) {{999}}-{{9999}}');
       // Check opts
-      assert.equal(formatted.opts.pattern, '({{999}}) {{999}}-{{9999}}');
+      assert.equal(formatted.opts.patterns[0]['*'], '({{999}}) {{999}}-{{9999}}');
       assert.isTrue(formatted.opts.persistent);
       // Check pattern
       assert.isObject(formatted.chars);
@@ -137,6 +137,51 @@ describe('formatter.js', function () {
     });
   });
 
+  //
+  // Formatter with value dependent patterns
+  //
+  describe('value dependent patterns', function () {
+    it('Should apply the default format', function (done) {
+      formatted = new Formatter(el, {
+        patterns: [
+          { '*': '!{{9}}' }
+        ]
+      });
+
+      user.keySeq('1', function () {
+        assert.equal(formatted.el.value, '!1');
+        done();
+      });
+    });
+
+    it('Should apply appropriate format based on current value', function (done) {
+      formatted = new Formatter(el, {
+        patterns: [
+          { '^0': '!{{9999}}' },
+          {  '*': '{{9999}}' }
+        ]
+      });
+
+      user.keySeq('0123', function () {
+        assert.equal(formatted.el.value, '!0123');
+        done();
+      });
+    });
+
+    it('Should apply the first appropriate format that matches the current value', function (done) {
+      formatted = new Formatter(el, {
+        patterns: [
+          {  '^0': 'first:{{9999}}' },
+          { '^00': 'second:{{9999}}' }
+        ]
+      });
+
+      user.keySeq('00', function () {
+        assert.equal(formatted.el.value, 'first:00');
+        done();
+      });
+    });
+  });
 
   //
   // Formatter with persistence
@@ -293,7 +338,7 @@ describe('formatter.js', function () {
         done();
       });
     });
- 
+
     it('Should update value when resetPattern method is called without changing pattern', function (done) {
       user.keySeq('2456789013', function () {
         formatted.resetPattern();
@@ -312,5 +357,5 @@ describe('formatter.js', function () {
       });
     });
   });
-  
+
 });

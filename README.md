@@ -70,6 +70,14 @@ Opts
   * a: [A-Za-z]
   * \*: [A-Za-z0-9] 
 * **persistent**: \[False\] Boolean representing if the formatted characters are always visible (persistent), or if they appear as you type.
+* **patterns** (optional, replaces *pattern*): Array representing a priority ordered set of patterns that may apply dynamically based on the current input value. Each value in the array is an object, whose key is a regular expression string and value is a *pattern* (see above). The regular expression is tested against the unformatted input value. You may use the special key `'*'` to catch all input values.
+```
+[
+  { '^\d{5}$': 'zip: {{99999}}' },
+  { '^.{6,8}$: 'postal code: {{********}}' },
+  { '*': 'unknown: {{**********}}' }
+]
+```
 
 
 
