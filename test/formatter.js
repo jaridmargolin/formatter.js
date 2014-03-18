@@ -282,7 +282,7 @@ describe('formatter.js', function () {
       user.keySeq('1234567890', function () {
         sel = { begin: 2, end: 8 };
         user.key('backspace');
-        assert.equal(formatted.el.value, '(167) 890');
+        assert.equal(formatted.el.value, '(167) 890-');
         done();
       });
     });
@@ -306,6 +306,22 @@ describe('formatter.js', function () {
       });
     });
 
+    it('Should leave a trailing format preceding the deleted character on backspace key', function (done) {
+      user.keySeq('1234', function () {
+        user.key('backspace');
+        assert.equal(formatted.el.value, '(123) ');
+        done();
+      });
+    });
+
+    it('Should remove a format character when it is the last character on backspace key', function (done) {
+      user.keySeq('123', function () {
+        user.key('backspace');
+        assert.equal(formatted.el.value, '(12');
+        done();
+      });
+    });
+
     it('Should completely empty field', function (done) {
       user.keySeq('1', function () {
         user.key('backspace');
@@ -317,7 +333,7 @@ describe('formatter.js', function () {
     it('Should not add chars past focus location if deleting', function (done) {
       user.keySeq('1234567', function () {
         user.key('backspace');
-        assert.equal(formatted.el.value, '(123) 456');
+        assert.equal(formatted.el.value, '(123) 456-');
         done();
       });
     });
