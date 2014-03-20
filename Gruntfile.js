@@ -54,6 +54,7 @@ module.exports = function(grunt) {
           'src/tmpls/intro.js',
           'src/formatter.js',
           'src/pattern.js',
+          'src/pattern-matcher.js',
           'src/inpt-sel.js',
           'src/utils.js',
           'src/tmpls/outro.js'
@@ -65,6 +66,7 @@ module.exports = function(grunt) {
           'src/tmpls/jquery.intro.js',
           'src/formatter.js',
           'src/pattern.js',
+          'src/pattern-matcher.js',
           'src/inpt-sel.js',
           'src/utils.js',
           'src/tmpls/jquery.outro.js'

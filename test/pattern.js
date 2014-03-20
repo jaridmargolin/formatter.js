@@ -4,7 +4,7 @@
  * (C) 2013 First Opinion
  * MIT LICENCE
  *
- */ 
+ */
 
 // 3rd party
 var should = require('chai').should(),
@@ -44,6 +44,34 @@ describe('pattern.js', function () {
         '9': 'A'
       });
       assert.equal(result.mLength, 14);
+    });
+
+    describe('edge cases', function () {
+      it('Should parse a pattern with a leading char', function () {
+        var result = pattern.parse('_{{**}}');
+
+        assert.deepEqual(result.chars, {
+          '0': '_'
+        });
+        assert.deepEqual(result.inpts, {
+          '0': '*',
+          '1': '*'
+        });
+        assert.equal(result.mLength, 3);
+      });
+
+      it('Should parse a pattern with a trailing char', function () {
+        var result = pattern.parse('{{**}}_');
+
+        assert.deepEqual(result.chars, {
+          '2': '_'
+        });
+        assert.deepEqual(result.inpts, {
+          '0': '*',
+          '1': '*'
+        });
+        assert.equal(result.mLength, 3);
+      });
     });
   });
 

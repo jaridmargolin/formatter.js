@@ -103,3 +103,24 @@ utils.isSpecialKey = function (k) {
 utils.isModifier = function (evt) {
   return evt.ctrlKey || evt.altKey || evt.metaKey;
 };
+
+//
+// Iterates over each property of object or array.
+//
+utils.forEach = function (collection, callback, thisArg) {
+  if (collection.hasOwnProperty("length")) {
+    for (var index = 0, len = collection.length; index < len; index++) {
+      if (callback.call(thisArg, collection[index], index, collection) === false) {
+        break;
+      }
+    }
+  } else {
+    for (var key in collection) {
+      if (collection.hasOwnProperty(key)) {
+        if (callback.call(thisArg, collection[key], key, collection) === false) {
+          break;
+        }
+      }
+    }
+  }
+};

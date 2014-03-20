@@ -4,7 +4,7 @@
  * (C) 2013 First Opinion
  * MIT LICENCE
  *
- */ 
+ */
 
 // 3rd party
 var should = require('chai').should(),
@@ -92,4 +92,59 @@ describe('utils.js', function () {
     });
   });
 
+
+  // utils.forEach
+  // Iterate over a collection
+  describe('forEach', function () {
+    it('Should iterate over an array', function () {
+      var result = [];
+      utils.forEach(['a','b','c'], function (val, key) {
+        result.push(key);
+        result.push(val);
+      });
+
+      assert.deepEqual(result, [0,'a',1,'b',2,'c']);
+    });
+    it('Should iterate over an object', function () {
+      var result = [];
+      utils.forEach({ 'first': 'a', second: 'b' }, function (val, key) {
+        result.push(key);
+        result.push(val);
+      });
+
+      assert.deepEqual(result, ['first', 'a', 'second', 'b']);
+    });
+    it('Should ignore prototypically inherited properties', function () {
+      var parent = function () {
+        this.property = 'property';
+      };
+      parent.prototype = { protoProperty: 'protoProperty' } ;
+
+      var result = [];
+      utils.forEach(new parent(), function (val) {
+        result.push(val);
+      });
+
+      assert.deepEqual(result, ['property']);
+    });
+    it('Should stop short when callback returns false', function () {
+      var result = [];
+      utils.forEach(['a','b','c'], function (val, key) {
+        result.push(key);
+        result.push(val);
+        return false;
+      });
+
+      assert.deepEqual(result, [0,'a']);
+    });
+    it('Should bind the callback to the given thisArg', function () {
+      var result = [];
+      utils.forEach(['a','b','c'], function (val, key) {
+        this.push(key);
+        this.push(val);
+      }, result);
+
+      assert.deepEqual(result, [0,'a',1,'b',2,'c']);
+    });
+  });
 });
