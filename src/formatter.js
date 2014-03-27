@@ -182,7 +182,7 @@ Formatter.prototype._keyPress = function (evt) {
   if (evt.which) {
     k = evt.which;
   } else {
-    k = evt.keyCode;
+    k = (window.event) ? evt.which : evt.keyCode;
     isSpecial = utils.isSpecialKey(k);
   }
   // Process the keyCode and prevent default
