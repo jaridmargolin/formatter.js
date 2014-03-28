@@ -70,9 +70,6 @@ function Formatter(el, opts) {
   utils.addListener(self.el, 'keydown', function (evt) {
     self._keyDown(evt);
   });
-  utils.addListener(self.el, 'keypress', function (evt) {
-    self._keyPress(evt);
-  });
   utils.addListener(self.el, 'paste', function (evt) {
     self._paste(evt);
   });
@@ -167,26 +164,10 @@ Formatter.prototype._keyDown = function (evt) {
     this._processKey(null, k);
     return utils.preventDefault(evt);
   }
-};
-
-//
-// @private
-// Handler called on all keyPress strokes. Only processes
-// character keys (as long as no modifier key is in use).
-//
-Formatter.prototype._keyPress = function (evt) {
-  // The first thing we need is the character code
-  var k, isSpecial;
-  // Mozilla will trigger on special keys and assign the the value 0
-  // We want to use that 0 rather than the keyCode it assigns.
-  if (evt.which) {
-    k = evt.which;
-  } else {
-    k = (window.event) ? evt.which : evt.keyCode;
-    isSpecial = utils.isSpecialKey(k);
-  }
-  // Process the keyCode and prevent default
-  if (!utils.isDelKey(k) && !isSpecial && !utils.isModifier(evt)) {
+  
+   // Process the keyCode and prevent default
+  var isSpecial = utils.isSpecialKey(k);
+  if (!isSpecial && !utils.isModifier(evt)) {
     this._processKey(String.fromCharCode(k), false);
     return utils.preventDefault(evt);
   }
