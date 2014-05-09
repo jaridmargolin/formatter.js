@@ -1,5 +1,5 @@
 /*!
- * v0.1.0
+ * v0.1.1
  * Copyright (c) 2014 First Opinion
  * formatter.js is open sourced under the MIT license.
  *
