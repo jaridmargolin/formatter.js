@@ -1,6 +1,6 @@
 {
   "name": "formatter.js",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Format user input to match a specified pattern",
   "author": "Jarid Margolin <jarid@firstopinion.com>",
   "repository": {

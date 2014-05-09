@@ -263,6 +263,15 @@ describe('formatter.js', function () {
       });
     });
 
+    it('Should remove characters in correct order when backspacing over a formatted character.', function (done) {
+      fakey.str(el, '1234567890', function () {
+        fakey.key(el, 'backspace', 6, function () {
+          assert.equal(formatted.el.value, '(123) 45 -    ');
+          done();
+        });
+      });
+    });
+
     it('Should remove next character on delete key', function (done) {
       fakey.str(el, '234567890', function () {
         inptSel.set(el, 2);
@@ -307,7 +316,7 @@ describe('formatter.js', function () {
       fakey.str(el, '1234567890', function () {
         inptSel.set(el, { begin: 2, end: 8 });
         fakey.key(el, 'backspace', function () {
-          assert.equal(formatted.el.value, '(167) 890-');
+          assert.equal(formatted.el.value, '(167) 890');
           done();
         });
       });
@@ -333,19 +342,10 @@ describe('formatter.js', function () {
       });
     });
 
-    it('Should leave a trailing format preceding the deleted character on backspace key', function (done) {
-      fakey.str(el, '1234', function () {
-        fakey.key(el, 'backspace', function () {
-          assert.equal(formatted.el.value, '(123) ');
-          done();
-        });
-      });
-    });
-
     it('Should remove a format character when it is the last character on backspace key', function (done) {
       fakey.str(el, '123', function () {
         fakey.key(el, 'backspace', function () {
-          assert.equal(formatted.el.value, '(12');
+          assert.equal(formatted.el.value, '(123');
           done();
         });
       });
@@ -363,7 +363,7 @@ describe('formatter.js', function () {
     it('Should not add chars past focus location if deleting', function (done) {
       fakey.str(el, '1234567', function () {
         fakey.key(el, 'backspace', function () {
-          assert.equal(formatted.el.value, '(123) 456-');
+          assert.equal(formatted.el.value, '(123) 456');
           done();
         });
       });

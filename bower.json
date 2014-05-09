@@ -1,6 +1,6 @@
 {
   "name": "formatter.js",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "devDependencies": {
     "easy-amdtest": "~0.0.1",
     "requirejs": "~2.1.11",

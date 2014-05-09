@@ -190,16 +190,14 @@ var utils = function () {
       var keys = {
           'backspace': {
             'which': 8,
-            'keyCode': 8,
-            'shiftKey': false
+            'keyCode': 8
           },
           'delete': {
             'which': 46,
-            'keyCode': 46,
-            'shiftKey': false
+            'keyCode': 46
           }
         };
-      return getMatchingKey(which, keyCode, keys);
+      return utils.getMatchingKey(which, keyCode, keys);
     };
     //
     // Returns true/false if k is a del keyPress
@@ -216,8 +214,25 @@ var utils = function () {
             'keyCode': 46
           }
         };
-      return getMatchingKey(which, keyCode, keys);
+      return utils.getMatchingKey(which, keyCode, keys);
     };
+    // //
+    // // Determine if keydown relates to specialKey
+    // //
+    // utils.isSpecialKeyDown = function (which, keyCode) {
+    //   var keys = {
+    //     'tab': { 'which': 9, 'keyCode': 9 },
+    //     'enter': { 'which': 13, 'keyCode': 13 },
+    //     'end': { 'which': 35, 'keyCode': 35 },
+    //     'home': { 'which': 36, 'keyCode': 36 },
+    //     'leftarrow': { 'which': 37, 'keyCode': 37 },
+    //     'uparrow': { 'which': 38, 'keyCode': 38 },
+    //     'rightarrow': { 'which': 39, 'keyCode': 39 },
+    //     'downarrow': { 'which': 40, 'keyCode': 40 },
+    //     'F5': { 'which': 116, 'keyCode': 116 }
+    //   };
+    //   return utils.getMatchingKey(which, keyCode, keys);
+    // };
     //
     // Determine if keypress relates to specialKey
     //
@@ -232,11 +247,11 @@ var utils = function () {
             'keyCode': 13
           },
           'end': {
-            'which': 35,
+            'which': 0,
             'keyCode': 35
           },
           'home': {
-            'which': 36,
+            'which': 0,
             'keyCode': 36
           },
           'leftarrow': {
@@ -260,7 +275,7 @@ var utils = function () {
             'keyCode': 116
           }
         };
-      return getMatchingKey(which, keyCode, keys);
+      return utils.getMatchingKey(which, keyCode, keys);
     };
     //
     // Returns true/false if modifier key is held down
@@ -615,7 +630,7 @@ var formatter = function (patternMatcher, inptSel, utils) {
     // @private
     // Using the provided key information, alter el value.
     //
-    Formatter.prototype._processKey = function (chars, delKey, ingoreCaret) {
+    Formatter.prototype._processKey = function (chars, delKey, ignoreCaret) {
       // Get current state
       this.sel = inptSel.get(this.el);
       this.val = this.el.value;
@@ -629,13 +644,8 @@ var formatter = function (patternMatcher, inptSel, utils) {
         this._delete();
       } else if (delKey && this.sel.begin - 1 >= 0) {
         // Always have a delta of at least -1 for the character being deleted.
+        this.val = utils.removeChars(this.val, this.sel.end - 1, this.sel.end);
         this.delta -= 1;
-        // Count number of additional format chars to be deleted. (A group of multiple format chars should be deleted like one value char.)
-        while (this.chars[this.focus - 1]) {
-          this.delta--;
-          this.focus--;
-        }
-        this.val = utils.removeChars(this.val, this.sel.end + this.delta, this.sel.end);
       } else if (delKey) {
         return true;
       }
@@ -646,7 +656,7 @@ var formatter = function (patternMatcher, inptSel, utils) {
         this.delta += chars.length;
       }
       // Format el.value (also handles updating caret position)
-      this._formatValue(ingoreCaret);
+      this._formatValue(ignoreCaret);
     };
     //
     // @private
@@ -767,10 +777,11 @@ var formatter = function (patternMatcher, inptSel, utils) {
           this.focus++;
         }
       } else {
-        // Avoid caching val.length and this.focus, as they may change in _addChar.
+        // Avoid caching val.length, as they may change in _addChar.
         for (var j = 0; j <= this.val.length; j++) {
-          // When moving backwards, i.e. delting characters, don't add format characters past focus point.
-          if (this.delta <= 0 && j === this.focus && this.chars[j] === undefined || this.focus === 0) {
+          // When moving backwards there are some race conditions where we
+          // dont want to add the character
+          if (this.delta <= 0 && j === this.focus) {
             return true;
           }
           // Place character in current position of the formatted string.
