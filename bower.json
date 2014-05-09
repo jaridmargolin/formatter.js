@@ -9,7 +9,7 @@
   },
   "ignore": [
     "**/.*",
-    "Grunfile.js",
+    "Gruntfile.js",
     "src",
     "docs",
     "test"
