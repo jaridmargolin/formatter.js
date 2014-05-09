@@ -1,5 +1,5 @@
 /*!
- * v0.0.9
+ * v0.1.3
  * Copyright (c) 2014 First Opinion
  * formatter.js is open sourced under the MIT license.
  *
@@ -114,7 +114,7 @@ var utils = function () {
     // Define module
     var utils = {};
     // Useragent info for keycode handling
-    var uAgent = typeof navigator !== 'undefined' ? navigator.userAgent : null, iPhone = /iphone/i.test(uAgent);
+    var uAgent = typeof navigator !== 'undefined' ? navigator.userAgent : null;
     //
     // Shallow copy properties from n objects to destObj
     //
@@ -172,28 +172,110 @@ var utils = function () {
       }
     };
     //
-    // Returns true/false if k is a del key
+    // Loop over object and checking for matching properties
     //
-    utils.isDelKey = function (k) {
-      return k === 8 || k === 46 || iPhone && k === 127;
+    utils.getMatchingKey = function (which, keyCode, keys) {
+      // Loop over and return if matched.
+      for (var k in keys) {
+        var key = keys[k];
+        if (which === key.which && keyCode === key.keyCode) {
+          return k;
+        }
+      }
     };
     //
-    // Returns true/false if k is an arrow key
+    // Returns true/false if k is a del keyDown
     //
-    utils.isSpecialKey = function (k) {
-      var codes = {
-          '9': 'tab',
-          '13': 'enter',
-          '35': 'end',
-          '36': 'home',
-          '37': 'leftarrow',
-          '38': 'uparrow',
-          '39': 'rightarrow',
-          '40': 'downarrow',
-          '116': 'F5'
+    utils.isDelKeyDown = function (which, keyCode) {
+      var keys = {
+          'backspace': {
+            'which': 8,
+            'keyCode': 8
+          },
+          'delete': {
+            'which': 46,
+            'keyCode': 46
+          }
         };
-      // If del or special key
-      return codes[k];
+      return utils.getMatchingKey(which, keyCode, keys);
+    };
+    //
+    // Returns true/false if k is a del keyPress
+    //
+    utils.isDelKeyPress = function (which, keyCode) {
+      var keys = {
+          'backspace': {
+            'which': 8,
+            'keyCode': 8,
+            'shiftKey': false
+          },
+          'delete': {
+            'which': 0,
+            'keyCode': 46
+          }
+        };
+      return utils.getMatchingKey(which, keyCode, keys);
+    };
+    // //
+    // // Determine if keydown relates to specialKey
+    // //
+    // utils.isSpecialKeyDown = function (which, keyCode) {
+    //   var keys = {
+    //     'tab': { 'which': 9, 'keyCode': 9 },
+    //     'enter': { 'which': 13, 'keyCode': 13 },
+    //     'end': { 'which': 35, 'keyCode': 35 },
+    //     'home': { 'which': 36, 'keyCode': 36 },
+    //     'leftarrow': { 'which': 37, 'keyCode': 37 },
+    //     'uparrow': { 'which': 38, 'keyCode': 38 },
+    //     'rightarrow': { 'which': 39, 'keyCode': 39 },
+    //     'downarrow': { 'which': 40, 'keyCode': 40 },
+    //     'F5': { 'which': 116, 'keyCode': 116 }
+    //   };
+    //   return utils.getMatchingKey(which, keyCode, keys);
+    // };
+    //
+    // Determine if keypress relates to specialKey
+    //
+    utils.isSpecialKeyPress = function (which, keyCode) {
+      var keys = {
+          'tab': {
+            'which': 0,
+            'keyCode': 9
+          },
+          'enter': {
+            'which': 13,
+            'keyCode': 13
+          },
+          'end': {
+            'which': 0,
+            'keyCode': 35
+          },
+          'home': {
+            'which': 0,
+            'keyCode': 36
+          },
+          'leftarrow': {
+            'which': 0,
+            'keyCode': 37
+          },
+          'uparrow': {
+            'which': 0,
+            'keyCode': 38
+          },
+          'rightarrow': {
+            'which': 0,
+            'keyCode': 39
+          },
+          'downarrow': {
+            'which': 0,
+            'keyCode': 40
+          },
+          'F5': {
+            'which': 116,
+            'keyCode': 116
+          }
+        };
+      return utils.getMatchingKey(which, keyCode, keys);
     };
     //
     // Returns true/false if modifier key is held down
@@ -493,7 +575,7 @@ var formatter = function (patternMatcher, inptSel, utils) {
       // The first thing we need is the character code
       var k = evt.which || evt.keyCode;
       // If delete key
-      if (k && utils.isDelKey(k)) {
+      if (k && utils.isDelKeyDown(evt.which, evt.keyCode)) {
         // Process the keyCode and prevent default
         this._processKey(null, k);
         return utils.preventDefault(evt);
@@ -509,14 +591,10 @@ var formatter = function (patternMatcher, inptSel, utils) {
       var k, isSpecial;
       // Mozilla will trigger on special keys and assign the the value 0
       // We want to use that 0 rather than the keyCode it assigns.
-      if (evt.which) {
-        k = evt.which;
-      } else {
-        k = evt.keyCode;
-        isSpecial = utils.isSpecialKey(k);
-      }
+      k = evt.which || evt.keyCode;
+      isSpecial = utils.isSpecialKeyPress(evt.which, evt.keyCode);
       // Process the keyCode and prevent default
-      if (!utils.isDelKey(k) && !isSpecial && !utils.isModifier(evt)) {
+      if (!utils.isDelKeyPress(evt.which, evt.keyCode) && !isSpecial && !utils.isModifier(evt)) {
         this._processKey(String.fromCharCode(k), false);
         return utils.preventDefault(evt);
       }
@@ -552,7 +630,7 @@ var formatter = function (patternMatcher, inptSel, utils) {
     // @private
     // Using the provided key information, alter el value.
     //
-    Formatter.prototype._processKey = function (chars, delKey, ingoreCaret) {
+    Formatter.prototype._processKey = function (chars, delKey, ignoreCaret) {
       // Get current state
       this.sel = inptSel.get(this.el);
       this.val = this.el.value;
@@ -566,13 +644,8 @@ var formatter = function (patternMatcher, inptSel, utils) {
         this._delete();
       } else if (delKey && this.sel.begin - 1 >= 0) {
         // Always have a delta of at least -1 for the character being deleted.
+        this.val = utils.removeChars(this.val, this.sel.end - 1, this.sel.end);
         this.delta -= 1;
-        // Count number of additional format chars to be deleted. (A group of multiple format chars should be deleted like one value char.)
-        while (this.chars[this.focus - 1]) {
-          this.delta--;
-          this.focus--;
-        }
-        this.val = utils.removeChars(this.val, this.sel.end + this.delta, this.sel.end);
       } else if (delKey) {
         return true;
       }
@@ -583,7 +656,7 @@ var formatter = function (patternMatcher, inptSel, utils) {
         this.delta += chars.length;
       }
       // Format el.value (also handles updating caret position)
-      this._formatValue(ingoreCaret);
+      this._formatValue(ignoreCaret);
     };
     //
     // @private
@@ -704,10 +777,11 @@ var formatter = function (patternMatcher, inptSel, utils) {
           this.focus++;
         }
       } else {
-        // Avoid caching val.length and this.focus, as they may change in _addChar.
+        // Avoid caching val.length, as they may change in _addChar.
         for (var j = 0; j <= this.val.length; j++) {
-          // When moving backwards, i.e. delting characters, don't add format characters past focus point.
-          if (this.delta <= 0 && j === this.focus && this.chars[j] === undefined || this.focus === 0) {
+          // When moving backwards there are some race conditions where we
+          // dont want to add the character
+          if (this.delta <= 0 && j === this.focus) {
             return true;
           }
           // Place character in current position of the formatted string.
