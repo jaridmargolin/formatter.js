@@ -160,7 +160,7 @@ Formatter.prototype._keyDown = function (evt) {
   var k = evt.which || evt.keyCode;
 
   // If delete key
-  if (k && utils.isDelKey(k)) {
+  if (k && utils.isDelKeyDown(evt.which, evt.keyCode)) {
     // Process the keyCode and prevent default
     this._processKey(null, k);
     return utils.preventDefault(evt);
@@ -177,14 +177,11 @@ Formatter.prototype._keyPress = function (evt) {
   var k, isSpecial;
   // Mozilla will trigger on special keys and assign the the value 0
   // We want to use that 0 rather than the keyCode it assigns.
-  if (evt.which) {
-    k = evt.which;
-  } else {
-    k = evt.keyCode;
-    isSpecial = utils.isSpecialKey(k);
-  }
+  k = evt.which || evt.keyCode;
+  isSpecial = utils.isSpecialKeyPress(evt.which, evt.keyCode);
+
   // Process the keyCode and prevent default
-  if (!utils.isDelKey(k) && !isSpecial && !utils.isModifier(evt)) {
+  if (!utils.isDelKeyPress(evt.which, evt.keyCode) && !isSpecial && !utils.isModifier(evt)) {
     this._processKey(String.fromCharCode(k), false);
     return utils.preventDefault(evt);
   }

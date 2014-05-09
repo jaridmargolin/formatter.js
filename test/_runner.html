@@ -28,9 +28,15 @@
         urlArgs: 'bust=' + (new Date()).getTime(),
         paths: {
           'proclaim' : '/node_modules/proclaim/lib/proclaim',
+          'sinon'    : '/node_modules/sinon/pkg/sinon',
           "jquery"   : '/bower_components/jquery/dist/jquery',
           'mocha'    : '/node_modules/mocha/mocha',
           'fakey'    : '/bower_components/fakey/dist/fakey'
+        },
+        shim: {
+          'sinon': {
+            exports: 'sinon'
+          }
         }
       }).run({
         name: 'mocha',

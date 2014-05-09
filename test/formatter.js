@@ -8,13 +8,14 @@
 define([
   'jquery',
   'proclaim',
+  'sinon',
   'fakey',
   'formatter',
   'inpt-sel',
   'pattern-matcher',
   'pattern',
   'utils'
-], function ($, assert, fakey, Formatter, inptSel, utils) {
+], function ($, assert, sinon, fakey, Formatter, inptSel, utils) {
 
 
 //
@@ -27,6 +28,9 @@ describe('formatter.js', function () {
 
   // Test vars
   var formatted, $el, el;
+
+  // Define new inptType
+  Formatter.addInptType('D', /[A-Za-z0-9.]/);
 
   // Add fresh element
   beforeEach(function () {
@@ -70,23 +74,39 @@ describe('formatter.js', function () {
       assert.isNumber(formatted.focus);
     });
 
-    // it('Should natively handle home, end, and arrow keys', function (done) {
-    //   createInstance('({{999}}) {{999}}-{{9999}}');
+    it('Should natively handle home, end, and arrow keys', function (done) {
+      createInstance('({{999}}) {{999}}-{{9999}}');
 
-    //   fakey.seq(el, [
-    //     { key: 'leftarrow' },
-    //     { key: 'rightarrow' },
-    //     { key: 'uparrow' },
-    //     { key: 'downarrow' },
-    //     { key: 'home' },
-    //     { key: 'end' },
-    //     { key: 'enter' },
-    //     { key: 'tab' }
-    //   ], function () {
-    //     assert.equal(formatted.focus, 1);
-    //     done();
-    //   });      
-    // });
+      sinon.spy(Formatter.prototype, '_processKey');
+
+      fakey.seq(el, [
+        { key: 'leftarrow' },
+        { key: 'rightarrow' },
+        { key: 'uparrow' },
+        { key: 'downarrow' },
+        { key: 'home' },
+        { key: 'end' },
+        { key: 'enter' },
+        { key: 'tab' }
+      ], function () {
+        assert.ok(Formatter.prototype._processKey.notCalled);
+        Formatter.prototype._processKey.restore();
+        done();
+      });      
+    });
+
+    it('Should be capable of containg a period in the pattern', function (done) {
+      createInstance('http://www.{{DDDDDDDD}}');
+
+      fakey.seq(el, [
+        { str: 'abcd' },
+        { key: '.' },
+        { str: 'com'}
+      ], function () {
+        assert.equal(formatted.el.value, 'http://www.abcd.com');
+        done();
+      });      
+    });
 
     it('Should update value when resetPattern method is called', function (done) {
       createInstance('({{999}}) {{999}}-{{9999}}');
