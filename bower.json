@@ -1,6 +1,6 @@
 {
   "name": "formatter.js",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "devDependencies": {
     "easy-amdtest": "~0.0.1",
     "requirejs": "~2.1.11",
@@ -9,6 +9,7 @@
   },
   "ignore": [
     "**/.*",
+    "Grunfile.js",
     "src",
     "docs",
     "test"
