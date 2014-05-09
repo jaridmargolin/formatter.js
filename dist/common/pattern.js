@@ -6,7 +6,7 @@
  */
 
 
-define(function () {
+
 
 
 // Define module
@@ -76,7 +76,6 @@ pattern.parse = function (pattern) {
 
 
 // Expose
-return pattern;
+module.exports = pattern;
 
 
-});

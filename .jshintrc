@@ -1,0 +1,28 @@
+{
+  "node": true,
+  "camelcase": true,
+  "curly": true,
+  "eqeqeq": true,
+  "immed": true,
+  "indent": false,
+  "latedef": true,
+  "newcap": true,
+  "noarg": true,
+  "quotmark": "single",
+  "undef": false,
+  "unused": false,
+  "trailing": true,
+  "smarttabs": true,
+  "laxbreak": true,
+  "boss": true,
+  "sub": true,
+  "immed": false,
+  "predef": {
+    "describe": true,
+    "it": true,
+    "before": true,
+    "beforeEach": true,
+    "after": true,
+    "afterEach": true
+  }
+}

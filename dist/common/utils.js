@@ -6,7 +6,7 @@
  */
 
 
-define(function () {
+
 
 
 // Define module
@@ -131,7 +131,6 @@ utils.forEach = function (collection, callback, thisArg) {
 
 
 // Expose
-return utils;
+module.exports = utils;
 
 
-});

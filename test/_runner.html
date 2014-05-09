@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- meta -->
+    <meta charset="utf-8" />
+    <title>formatter.js</title>
+  </head>
+
+  <body>
+    <!-- content -->
+    <div id="workboard"></div>
+    <div id="mocha"></div>
+
+    <!-- templates -->
+    <script id="tmpl-input-text" type="text/tmpl">
+      <input type="text">
+    </script>
+
+    <!-- tests -->
+    <script src="../bower_components/requirejs/require.js"></script>
+    <script src="../bower_components/easy-amdtest/dist/easy-amdtest.js"></script>
+    <script>
+      var testSuite = new EasyAMDTest({
+        baseUrl: '../src',
+        urlArgs: 'bust=' + (new Date()).getTime(),
+        paths: {
+          'proclaim' : '/node_modules/proclaim/lib/proclaim',
+          "jquery"   : '/bower_components/jquery/dist/jquery',
+          'mocha'    : '/node_modules/mocha/mocha',
+          'fakey'    : '/bower_components/fakey/dist/fakey'
+        }
+      }).run({
+        name: 'mocha',
+        tests: [
+          './utils.js',
+          './pattern.js',
+          './pattern-matcher.js',
+          './formatter.js'
+        ]
+      });
+    </script>
+  </body>
+</html>

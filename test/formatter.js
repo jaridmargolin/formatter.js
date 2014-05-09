@@ -1,66 +1,55 @@
-/*
- * test/utils.js:
- *
- * (C) 2013 First Opinion
- * MIT LICENCE
- *
+/*!
+ * test/formatter.js
+ * 
+ * Copyright (c) 2014 First Opinion
  */
 
-// 3rd party
-var restore = require('sinon').restore,
-    mock    = require('sinon').mock,
-    stub    = require('sinon').stub;
 
-var should  = require('chai').should(),
-    assert  = require('chai').assert;
-
-// first party
-var Formatter = require('../src/formatter'),
-    inptSel   = require('../src/inpt-sel'),
-    utils     = require('../src/utils'),
-    User      = require('./fake-user/user');
+define([
+  'jquery',
+  'proclaim',
+  'fakey',
+  'formatter',
+  'inpt-sel',
+  'pattern-matcher',
+  'pattern',
+  'utils'
+], function ($, assert, fakey, Formatter, inptSel, utils) {
 
 
 //
-// pattern.js tests
+// formatter.js tests
 //
 describe('formatter.js', function () {
 
-  // Scope vars
-  var formatted, user, sel, el;
+  // Global vars
+  var $workboard = $('#workboard');
 
+  // Test vars
+  var formatted, $el, el;
+
+  // Add fresh element
   beforeEach(function () {
-    // Fake user to carry out keyboard and mouse events
-    user = new User();
-    // Set init el
-    el = { value: '', blur: function () {} };
-    // Set init caret position
-    sel = { begin: 0, end: 0 };
-    // Stub
-    stub(utils, 'addListener', function (evt, type, handler) {
-      user.on(type, handler);
-    });
-    stub(inptSel, 'get', function () {
-      return sel;
-    });
-    stub(inptSel, 'set', function (el, pos) {
-      sel.begin = sel.end = pos;
-    });
+    var html = $('#tmpl-input-text').html();
+    $el = $(html);
+    el = $el[0];
+
+    $('#workboard').append($el);
   });
 
+  // Remove element
   afterEach(function () {
-    utils.addListener.restore();
-    inptSel.get.restore();
-    inptSel.set.restore();
+    $el.remove();
   });
 
   //
   // Formatter global tests
   //
   describe('global', function () {
+
     // Create new instance
     var createInstance = function (str) {
-      formatted = new Formatter(el, {
+      formatted = new Formatter($el[0], {
         pattern: str,
         persistent: true
       });
@@ -68,6 +57,7 @@ describe('formatter.js', function () {
 
     it('Should set init values and merge defaults', function () {
       createInstance('({{999}}) {{999}}-{{9999}}');
+
       // Check opts
       assert.equal(formatted.opts.patterns[0]['*'], '({{999}}) {{999}}-{{9999}}');
       assert.isTrue(formatted.opts.persistent);
@@ -80,48 +70,56 @@ describe('formatter.js', function () {
       assert.isNumber(formatted.focus);
     });
 
-    it('Should natively handle home, end, and arrow keys', function () {
-      createInstance('({{999}}) {{999}}-{{9999}}');
-      user.key('leftarrow');
-      user.key('rightarrow');
-      user.key('uparrow');
-      user.key('downarrow');
-      user.key('home');
-      user.key('end');
-      user.key('enter');
-      user.key('tab');
-      assert.equal(formatted.focus, 1);
-    });
+    // it('Should natively handle home, end, and arrow keys', function (done) {
+    //   createInstance('({{999}}) {{999}}-{{9999}}');
+
+    //   fakey.seq(el, [
+    //     { key: 'leftarrow' },
+    //     { key: 'rightarrow' },
+    //     { key: 'uparrow' },
+    //     { key: 'downarrow' },
+    //     { key: 'home' },
+    //     { key: 'end' },
+    //     { key: 'enter' },
+    //     { key: 'tab' }
+    //   ], function () {
+    //     assert.equal(formatted.focus, 1);
+    //     done();
+    //   });      
+    // });
 
     it('Should update value when resetPattern method is called', function (done) {
       createInstance('({{999}}) {{999}}-{{9999}}');
-      user.keySeq('24567890', function () {
+
+      fakey.str(el, '24567890', function () {
         formatted.resetPattern('{{999}}.{{999}}.{{9999}}');
         assert.equal(formatted.el.value, '245.678.90  ');
         done();
       });
     });
 
-    describe('input focus', function () {
-      it('Should focus to the next available inpt position', function (done) {
-        createInstance('({{999}}) {{999}}-{{9999}}');
-        user.keySeq('1237890', function () {
-          assert.equal(formatted.focus, 11);
-          done();
-        });
+    it('Should focus to the next available inpt position', function (done) {
+      createInstance('({{999}}) {{999}}-{{9999}}');
+
+      fakey.str(el, '1237890', function () {
+        assert.equal(formatted.focus, 11);
+        done();
       });
-      it('Should not focus on a formatted char', function (done) {
-        createInstance('({{999}}) {{999}}-{{9999}}');
-        user.keySeq('123', function () {
-          assert.equal(formatted.focus, 6);
-          done();
-        });
+    });
+
+    it('Should not focus on a formatted char', function (done) {
+      createInstance('({{999}}) {{999}}-{{9999}}');
+
+      fakey.str(el, '123', function () {
+        assert.equal(formatted.focus, 6);
+        done();
       });
     });
 
     it('Should enforce pattern maxLength', function (done) {
       createInstance('({{999}}) {{999}}-{{9999}}');
-      user.keySeq('12345678901', function () {
+      
+      fakey.str(el, '12345678901', function () {
         assert.equal(formatted.el.value, '(123) 456-7890');
         done();
       });
@@ -130,17 +128,20 @@ describe('formatter.js', function () {
     it('Should add regex inpts', function (done) {
       Formatter.addInptType('L', /[A-Z]/);
       createInstance('{{LLL}}');
-      user.keySeq('AaAaA', function () {
+
+      fakey.str(el, 'AaAaA', function () {
         assert.equal(formatted.el.value, 'AAA');
         done();
       });
     });
+
   });
 
   //
   // Formatter with value dependent patterns
   //
   describe('value dependent patterns', function () {
+
     it('Should apply the default format', function (done) {
       formatted = new Formatter(el, {
         patterns: [
@@ -148,7 +149,7 @@ describe('formatter.js', function () {
         ]
       });
 
-      user.keySeq('1', function () {
+      fakey.key(el, '1', function () {
         assert.equal(formatted.el.value, '!1');
         done();
       });
@@ -162,7 +163,7 @@ describe('formatter.js', function () {
         ]
       });
 
-      user.keySeq('0123', function () {
+      fakey.str(el, '0123', function () {
         assert.equal(formatted.el.value, '!0123');
         done();
       });
@@ -176,7 +177,7 @@ describe('formatter.js', function () {
         ]
       });
 
-      user.keySeq('00', function () {
+      fakey.str(el, '00', function () {
         assert.equal(formatted.el.value, 'first:00');
         done();
       });
@@ -187,8 +188,8 @@ describe('formatter.js', function () {
   // Formatter with persistence
   //
   describe('persistent: true', function () {
+
     beforeEach(function () {
-      // New instance
       formatted = new Formatter(el, {
         pattern: '({{999}}) {{999}}-{{9999}}',
         persistent: true
@@ -196,16 +197,16 @@ describe('formatter.js', function () {
     });
 
     it('Should format chars as they are entered', function (done) {
-      user.keySeq('1237890', function () {
+      fakey.str(el, '1237890', function () {
         assert.equal(formatted.el.value, '(123) 789-0   ');
         done();
       });
     });
 
     it('Should fromat chars entered mid str', function (done) {
-      user.keySeq('1237890', function () {
-        sel = { begin: 6, end: 6 };
-        user.keySeq('456', function () {
+      fakey.str(el, '1237890', function () {
+        inptSel.set(el, 6);
+        fakey.str(el, '456', function () {
           assert.equal(formatted.el.value, '(123) 456-7890');
           done();
         });
@@ -213,65 +214,69 @@ describe('formatter.js', function () {
     });
 
     it('Should delete chars when highlighted', function (done) {
-      user.keySeq('1234567890', function () {
-        sel = { begin: 2, end: 8 };
-        user.key('backspace');
-        assert.equal(formatted.el.value, '(167) 890-    ');
-        done();
-      });
-    });
-
-    it('Should handle pasting multiple characters', function (done) {
-      user.keySeq('167890', function () {
-        sel = { begin: 2, end: 2 };
-        user.paste('2345', function () {
-          assert.equal(formatted.el.value, '(123) 456-7890');
+      fakey.str(el, '1234567890', function () {
+        inptSel.set(el, { begin: 2, end: 8 });
+        fakey.key(el, 'backspace', function () {
+          assert.equal(formatted.el.value, '(167) 890-    ');
           done();
         });
       });
     });
 
+    // it('Should handle pasting multiple characters', function (done) {
+    //   user.keySeq('167890', function () {
+    //     sel = { begin: 2, end: 2 };
+    //     user.paste('2345', function () {
+    //       assert.equal(formatted.el.value, '(123) 456-7890');
+    //       done();
+    //     });
+    //   });
+    // });
+
     it('Should remove previous character on backspace key', function (done) {
-      user.keySeq('1234567890', function () {
-        sel = { begin: 2, end: 2 };
-        user.key('backspace');
-        assert.equal(formatted.el.value, '(234) 567-890 ');
-        done();
+      fakey.str(el, '1234567890', function () {
+        inptSel.set(el, 2);
+        fakey.key(el, 'backspace', function () {
+          assert.equal(formatted.el.value, '(234) 567-890 ');
+          done();
+        });
       });
     });
 
     it('Should remove next character on delete key', function (done) {
-      user.keySeq('234567890', function () {
-        sel = { begin: 2, end: 2 };
-        user.key('delete');
-        assert.equal(formatted.el.value, '(245) 678-90  ');
-        done();
+      fakey.str(el, '234567890', function () {
+        inptSel.set(el, 2);
+        fakey.key(el, 'delete', function () {
+          assert.equal(formatted.el.value, '(245) 678-90  ');
+          done();
+        });
       });
     });
+
   });
 
   //
   // Formatter without persistence
   //
   describe('persistent: false', function () {
+
     beforeEach(function () {
-      // New instance
       formatted = new Formatter(el, {
         pattern: '({{999}}) {{999}}-{{9999}}'
       });
     });
 
     it('Should format chars as they are entered', function (done) {
-      user.keySeq('1237890', function () {
+      fakey.str(el, '1237890', function () {
         assert.equal(formatted.el.value, '(123) 789-0');
         done();
       });
     });
 
     it('Should fromat chars entered mid str', function (done) {
-      user.keySeq('1237890', function () {
-        sel = { begin: 6, end: 6 };
-        user.keySeq('456', function () {
+      fakey.str(el, '1237890', function () {
+        inptSel.set(el, 6);
+        fakey.str(el, '456', function () {
           assert.equal(formatted.el.value, '(123) 456-7890');
           done();
         });
@@ -279,76 +284,83 @@ describe('formatter.js', function () {
     });
 
     it('Should delete chars when highlighted', function (done) {
-      user.keySeq('1234567890', function () {
-        sel = { begin: 2, end: 8 };
-        user.key('backspace');
-        assert.equal(formatted.el.value, '(167) 890-');
-        done();
-      });
-    });
-
-    it('Should handle pasting multiple characters', function (done) {
-      user.keySeq('167890', function () {
-        sel = { begin: 2, end: 2 };
-        user.paste('2345', function () {
-          assert.equal(formatted.el.value, '(123) 456-7890');
+      fakey.str(el, '1234567890', function () {
+        inptSel.set(el, { begin: 2, end: 8 });
+        fakey.key(el, 'backspace', function () {
+          assert.equal(formatted.el.value, '(167) 890-');
           done();
         });
       });
     });
 
+    // it('Should handle pasting multiple characters', function (done) {
+    //   fakey.str(el, '167890', function () {
+    //     inptSel.set(el, 2);
+    //     user.paste('2345', function () {
+    //       assert.equal(formatted.el.value, '(123) 456-7890');
+    //       done();
+    //     });
+    //   });
+    // });
+
     it('Should remove previous character on backspace key', function (done) {
-      user.keySeq('1234567890', function () {
-        sel = { begin: 2, end: 2 };
-        user.key('backspace');
-        assert.equal(formatted.el.value, '(234) 567-890');
-        done();
+      fakey.str(el, '1234567890', function () {
+        inptSel.set(el, 2);
+        fakey.key(el, 'backspace', function () {
+          assert.equal(formatted.el.value, '(234) 567-890');
+          done();
+        });
       });
     });
 
     it('Should leave a trailing format preceding the deleted character on backspace key', function (done) {
-      user.keySeq('1234', function () {
-        user.key('backspace');
-        assert.equal(formatted.el.value, '(123) ');
-        done();
+      fakey.str(el, '1234', function () {
+        fakey.key(el, 'backspace', function () {
+          assert.equal(formatted.el.value, '(123) ');
+          done();
+        });
       });
     });
 
     it('Should remove a format character when it is the last character on backspace key', function (done) {
-      user.keySeq('123', function () {
-        user.key('backspace');
-        assert.equal(formatted.el.value, '(12');
-        done();
+      fakey.str(el, '123', function () {
+        fakey.key(el, 'backspace', function () {
+          assert.equal(formatted.el.value, '(12');
+          done();
+        });
       });
     });
 
     it('Should completely empty field', function (done) {
-      user.keySeq('1', function () {
-        user.key('backspace');
-        assert.equal(formatted.el.value, '');
-        done();
+      fakey.key(el, '1', function () {
+        fakey.key(el, 'backspace', function () {
+          assert.equal(formatted.el.value, '');
+          done();
+        });
       });
     });
 
     it('Should not add chars past focus location if deleting', function (done) {
-      user.keySeq('1234567', function () {
-        user.key('backspace');
-        assert.equal(formatted.el.value, '(123) 456-');
-        done();
+      fakey.str(el, '1234567', function () {
+        fakey.key(el, 'backspace', function () {
+          assert.equal(formatted.el.value, '(123) 456-');
+          done();
+        });
       });
     });
 
     it('Should remove next character on delete key', function (done) {
-      user.keySeq('234567890', function () {
-        sel = { begin: 2, end: 2 };
-        user.key('delete');
-        assert.equal(formatted.el.value, '(245) 678-90');
-        done();
+      fakey.str(el, '234567890', function () {
+        inptSel.set(el, 2);
+        fakey.key(el, 'delete', function () {
+          assert.equal(formatted.el.value, '(245) 678-90');
+          done();
+        });
       });
     });
 
     it('Should update value when resetPattern method is called', function (done) {
-      user.keySeq('24567890', function () {
+      fakey.str(el, '24567890', function () {
         formatted.resetPattern('{{999}}.{{999}}.{{9999}}');
         assert.equal(formatted.el.value, '245.678.90');
         done();
@@ -356,7 +368,7 @@ describe('formatter.js', function () {
     });
 
     it('Should update value when resetPattern method is called without changing pattern', function (done) {
-      user.keySeq('2456789013', function () {
+      fakey.str(el, '2456789013', function () {
         formatted.resetPattern();
         assert.equal(formatted.el.value, '(245) 678-9013');
         done();
@@ -364,14 +376,17 @@ describe('formatter.js', function () {
     });
 
     it('Should not reset caret position on format', function (done) {
-      user.keySeq('24567890', function () {
-        sel = { begin: 2, end: 2 };
+      fakey.str(el, '24567890', function () {
         formatted.resetPattern();
         assert.equal(formatted.el.value, '(245) 678-90');
-        assert.deepEqual(sel, inptSel.get());
+        assert.deepEqual({ begin: 12, end: 12 }, inptSel.get(el));
         done();
       });
     });
+
   });
+
+});
+
 
 });

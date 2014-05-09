@@ -1,23 +1,41 @@
 {
   "name": "formatter.js",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Format user input to match a specified pattern",
   "author": "Jarid Margolin <jarid@firstopinion.com>",
   "repository": {
     "type": "git",
     "url": "https://github.com/firstopinion/formatter.js"
   },
-  "scripts": {
-    "test": "make test"
+  "bugs": {
+    "url": "https://github.com/easy-js/easy-amdtest/issues"
   },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "main": "./dist/common/formatter.js",
   "devDependencies": {
-    "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-uglify": "~0.3.3",
-    "grunt-contrib-jshint": "~0.8.0",
-    "grunt": "~0.4.1",
-    "mocha": "~1.17.1",
-    "sinon": "~1.8.2",
-    "chai": "~1.9.0"
+    "amdclean": "~1.5.0",
+    "grunt": "~0.4.3",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-concat": "~0.4.0",
+    "grunt-contrib-connect": "~0.7.1",
+    "grunt-contrib-copy": "~0.5.0",
+    "grunt-contrib-jshint": "~0.10.0",
+    "grunt-contrib-nodefy": "~0.2.1",
+    "grunt-contrib-requirejs": "~0.4.1",
+    "grunt-contrib-uglify": "~0.4.0",
+    "grunt-contrib-watch": "~0.6.1",
+    "grunt-gh-pages": "~0.9.1",
+    "grunt-jekyll": "~0.4.2",
+    "grunt-mocha-phantomjs": "~0.5.0",
+    "grunt-saucelabs": "~5.1.0",
+    "grunt-umd": "~1.7.3",
+    "grunt-wrap": "~0.3.0",
+    "matchdep": "~0.3.0",
+    "mocha": "~1.18.2",
+    "proclaim": "~2.0.0",
+    "sinon": "~1.9.0"
   },
   "license": "MIT"
 }

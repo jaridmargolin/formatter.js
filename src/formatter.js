@@ -5,14 +5,12 @@
  *
  */
 
-/* ExcludeStart */
-var patternMatcher = require('./pattern-matcher'),
-    inptSel = require('./inpt-sel'),
-    utils   = require('./utils');
+define([
+  'pattern-matcher',
+  'inpt-sel',
+  'utils'
+], function (patternMatcher, inptSel, utils) {
 
-// Define module
-module.exports = Formatter;
-/* ExcludeEnd */
 
 // Defaults
 var defaults = {
@@ -241,7 +239,7 @@ Formatter.prototype._processKey = function (chars, delKey,ingoreCaret) {
   }
 
   // Delete key (moves opposite direction)
-  else if (delKey && delKey == 46) {
+  else if (delKey && delKey === 46) {
     this._delete();
 
   // or Backspace and not at start
@@ -358,7 +356,7 @@ Formatter.prototype._removeChars = function () {
     pos = (i >= this.sel.begin) ? pos + this.delta : pos;
     val = this.val.charAt(pos);
     // Remove char and account for shift
-    if (curChar && curChar == val || curHldr && curHldr == val) {
+    if (curChar && curChar === val || curHldr && curHldr === val) {
       this.val = utils.removeChars(this.val, pos, pos + 1);
       shift--;
     }
@@ -469,3 +467,9 @@ Formatter.prototype._specFromSinglePattern = function (patternStr) {
   return [{ '*': patternStr }];
 };
 
+
+// Expose
+return Formatter;
+
+
+});

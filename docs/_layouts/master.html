@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>formatter.js by firstopinion</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>formatter.js</h1>
+        <p>Format user input to match a specified pattern</p>
+
+        <p class="view"><a href="https://github.com/firstopinion/formatter.js">View the Project on GitHub <small>firstopinion/formatter.js</small></a></p>
+        
+        <div class="menu">
+          <p class="menu-item"><a href="index.html">+ Docs</a></p>
+          <p class="menu-item"><a href="demos.html">+ Demos</a></p>
+        </div>
+
+        <ul>
+          <li><a href="https://github.com/firstopinion/formatter.js/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/firstopinion/formatter.js/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/firstopinion/formatter.js">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+
+        {{ content }}
+
+      </section>
+    </div>
+    <script src="http://code.jquery.com/jquery-1.10.1.js"></script>
+    <script src="javascripts/scale.fix.js"></script>
+    <script src="javascripts/formatter.min.js"></script>
+    {% raw %}
+    <script>
+      // $('#phone-input').formatter({
+      //   'pattern': '({{999}}) {{999}}.{{9999}}',
+      //   'persistent': true
+      // });
+      // $('#credit-input').formatter({
+      //   'pattern': '{{9999}}-{{9999}}-{{9999}}-{{9999}}'
+      // });
+      var creditInput = document.getElementById('credit-input');
+      if (creditInput) {
+        new Formatter(creditInput, {
+            'pattern': '{{9999}}-{{9999}}-{{9999}}-{{9999}}'
+        });
+      }
+      var phoneInput = document.getElementById('phone-input');
+      if (creditInput) {
+        new Formatter(phoneInput, {
+            'pattern': '({{999}}) {{999}}.{{9999}}',
+            'persistent': true
+        });
+      }
+    </script>
+    {% endraw %}
+  </body>
+</html>

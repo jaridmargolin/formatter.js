@@ -1,17 +1,16 @@
-/*!
- * v0.0.9
- * Copyright (c) 2013 First Opinion
- * formatter.js is open sourced under the MIT license.
+/*
+ * formatter.js
  *
- * thanks to digitalBush/jquery.maskedinput for some of the trickier
- * keycode handling
- */ 
+ * Class used to format input based on passed pattern
+ *
+ */
 
-;(function (name, context, definition) {
-  if (typeof module !== 'undefined' && module.exports) { module.exports = definition(); }
-  else if (typeof define === 'function' && define.amd) { define(definition); }
-  else { context[name] = definition(); }
-})('Formatter', this, function () {
+define([
+  'pattern-matcher',
+  'inpt-sel',
+  'utils'
+], function (patternMatcher, inptSel, utils) {
+
 
 // Defaults
 var defaults = {
@@ -240,7 +239,7 @@ Formatter.prototype._processKey = function (chars, delKey,ingoreCaret) {
   }
 
   // Delete key (moves opposite direction)
-  else if (delKey && delKey == 46) {
+  else if (delKey && delKey === 46) {
     this._delete();
 
   // or Backspace and not at start
@@ -357,7 +356,7 @@ Formatter.prototype._removeChars = function () {
     pos = (i >= this.sel.begin) ? pos + this.delta : pos;
     val = this.val.charAt(pos);
     // Remove char and account for shift
-    if (curChar && curChar == val || curHldr && curHldr == val) {
+    if (curChar && curChar === val || curHldr && curHldr === val) {
       this.val = utils.removeChars(this.val, pos, pos + 1);
       shift--;
     }
@@ -469,317 +468,8 @@ Formatter.prototype._specFromSinglePattern = function (patternStr) {
 };
 
 
-// Define module
-var pattern = {};
-
-// Match information
-var DELIM_SIZE = 4;
-
-// Our regex used to parse
-var regexp  = new RegExp('{{([^}]+)}}', 'g');
-
-//
-// Helper method to parse pattern str
-//
-var getMatches = function (pattern) {
-  // Populate array of matches
-  var matches = [],
-      match;
-  while(match = regexp.exec(pattern)) {
-    matches.push(match);
-  }
-
-  return matches;
-};
-
-//
-// Create an object holding all formatted characters
-// with corresponding positions
-//
-pattern.parse = function (pattern) {
-  // Our obj to populate
-  var info = { inpts: {}, chars: {} };
-
-  // Pattern information
-  var matches = getMatches(pattern),
-      pLength = pattern.length;
-
-  // Counters
-  var mCount = 0,
-      iCount = 0,
-      i = 0;
-
-  // Add inpts, move to end of match, and process
-  var processMatch = function (val) {
-    var valLength = val.length;
-    for (var j = 0; j < valLength; j++) {
-      info.inpts[iCount] = val.charAt(j);
-      iCount++;
-    }
-    mCount ++;
-    i += (val.length + DELIM_SIZE - 1);
-  };
-
-  // Process match or add chars
-  for (i; i < pLength; i++) {
-    if (mCount < matches.length && i == matches[mCount].index) {
-      processMatch(matches[mCount][1]);
-    } else {
-      info.chars[i - (mCount * DELIM_SIZE)] = pattern.charAt(i);
-    }
-  }
-
-  // Set mLength and return
-  info.mLength = i - (mCount * DELIM_SIZE);
-  return info;
-};
-
-//
-// Parse a matcher string into a RegExp. Accepts valid regular
-// expressions and the catchall '*'.
-// @private
-//
-var parseMatcher = function (matcher) {
-  if (matcher === '*') {
-    return /.*/;
-  }
-  return new RegExp(matcher);
-};
-
-//
-// Parse a pattern spec and return a function that returns a pattern
-// based on user input. The first matching pattern will be chosen.
-// Pattern spec format:
-// Array [
-//  Object: { Matcher(RegExp String) : Pattern(Pattern String) },
-//  ...
-// ]
-function patternMatcher (patternSpec) {
-  var matchers = [],
-    patterns = [];
-
-  // Iterate over each pattern in order.
-  utils.forEach(patternSpec, function (patternMatcher) {
-    // Process single property object to obtain pattern and matcher.
-    utils.forEach(patternMatcher, function (patternStr, matcherStr) {
-      var parsedPattern = pattern.parse(patternStr),
-        regExpMatcher = parseMatcher(matcherStr);
-
-      matchers.push(regExpMatcher);
-      patterns.push(parsedPattern);
-
-      // Stop after one iteration.
-      return false;
-    });
-  });
-
-  var getPattern = function (input) {
-    var matchedIndex;
-    utils.forEach(matchers, function (matcher, index) {
-      if (matcher.test(input)) {
-        matchedIndex = index;
-        return false;
-      }
-    });
-
-    return matchedIndex === undefined ? null : patterns[matchedIndex];
-  };
-
-  return {
-    getPattern: getPattern,
-    patterns: patterns,
-    matchers: matchers
-  };
-}
-
-// Define module
-var inptSel = {};
-
-//
-// Get begin and end positions of selected input. Return 0's
-// if there is no selectiion data
-//
-inptSel.get = function (el) {
-  // If normal browser return with result
-  if (typeof el.selectionStart == "number") {
-    return { 
-      begin: el.selectionStart,
-      end: el.selectionEnd
-    };
-  }
-
-  // Uh-Oh. We must be IE. Fun with TextRange!!
-  var range = document.selection.createRange();
-  // Determine if there is a selection
-  if (range && range.parentElement() == el) {
-    var inputRange = el.createTextRange(),
-        endRange   = el.createTextRange(),
-        length     = el.value.length;
-
-    // Create a working TextRange for the input selection
-    inputRange.moveToBookmark(range.getBookmark());
-
-    // Move endRange begin pos to end pos (hence endRange)
-    endRange.collapse(false);
-    
-    // If we are at the very end of the input, begin and end
-    // must both be the length of the el.value
-    if (inputRange.compareEndPoints("StartToEnd", endRange) > -1) {
-      return { begin: length, end: length };
-    }
-
-    // Note: moveStart usually returns the units moved, which 
-    // one may think is -length, however, it will stop when it
-    // gets to the begin of the range, thus giving us the
-    // negative value of the pos.
-    return {
-      begin: -inputRange.moveStart("character", -length),
-      end: -inputRange.moveEnd("character", -length)
-    };
-  }
-
-  //Return 0's on no selection data
-  return { begin: 0, end: 0 };
-};
-
-//
-// Set the caret position at a specified location
-//
-inptSel.set = function (el, pos) {
-  // If normal browser
-  if (el.setSelectionRange) {
-    el.focus();
-    el.setSelectionRange(pos,pos);
-
-  // IE = TextRange fun
-  } else if (el.createTextRange) {
-    var range = el.createTextRange();
-    range.collapse(true);
-    range.moveEnd('character', pos);
-    range.moveStart('character', pos);
-    range.select();
-  }
-};
-// Define module
-var utils = {};
-
-// Useragent info for keycode handling
-var uAgent = (typeof navigator !== 'undefined') ? navigator.userAgent : null,
-    iPhone = /iphone/i.test(uAgent);
-
-//
-// Shallow copy properties from n objects to destObj
-//
-utils.extend = function (destObj) {
-  for (var i = 1; i < arguments.length; i++) {
-    for (var key in arguments[i]) {
-      destObj[key] = arguments[i][key];
-    }
-  }
-  return destObj;
-};
-
-//
-// Add a given character to a string at a defined pos
-//
-utils.addChars = function (str, chars, pos) {
-  return str.substr(0, pos) + chars + str.substr(pos, str.length);
-};
-
-//
-// Remove a span of characters
-//
-utils.removeChars = function (str, start, end) {
-  return str.substr(0, start) + str.substr(end, str.length);
-};
-
-//
-// Return true/false is num false between bounds
-//
-utils.isBetween = function (num, bounds) {
-  bounds.sort(function(a,b) { return a-b; });
-  return (num > bounds[0] && num < bounds[1]);
-};
-
-//
-// Helper method for cross browser event listeners
-//
-utils.addListener = function (el, evt, handler) {
-  return (typeof el.addEventListener != "undefined")
-    ? el.addEventListener(evt, handler, false)
-    : el.attachEvent('on' + evt, handler);
-};
-
-//
-// Helper method for cross browser implementation of preventDefault
-//
-utils.preventDefault = function (evt) {
-  return (evt.preventDefault) ? evt.preventDefault() : (evt.returnValue = false);
-};
-
-//
-// Helper method for cross browser implementation for grabbing
-// clipboard data
-//
-utils.getClip = function (evt) {
-  if (evt.clipboardData) { return evt.clipboardData.getData('Text'); }
-  if (window.clipboardData) { return window.clipboardData.getData('Text'); }
-};
-
-//
-// Returns true/false if k is a del key
-//
-utils.isDelKey = function (k) {
-  return k === 8 || k === 46 || (iPhone && k === 127);
-};
-
-//
-// Returns true/false if k is an arrow key
-//
-utils.isSpecialKey = function (k) {
-  var codes = {
-    '9' : 'tab',
-    '13': 'enter',
-    '35': 'end',
-    '36': 'home',
-    '37': 'leftarrow',
-    '38': 'uparrow',
-    '39': 'rightarrow',
-    '40': 'downarrow',
-    '116': 'F5'
-  };
-  // If del or special key
-  return codes[k];
-};
-
-//
-// Returns true/false if modifier key is held down
-//
-utils.isModifier = function (evt) {
-  return evt.ctrlKey || evt.altKey || evt.metaKey;
-};
-
-//
-// Iterates over each property of object or array.
-//
-utils.forEach = function (collection, callback, thisArg) {
-  if (collection.hasOwnProperty("length")) {
-    for (var index = 0, len = collection.length; index < len; index++) {
-      if (callback.call(thisArg, collection[index], index, collection) === false) {
-        break;
-      }
-    }
-  } else {
-    for (var key in collection) {
-      if (collection.hasOwnProperty(key)) {
-        if (callback.call(thisArg, collection[key], key, collection) === false) {
-          break;
-        }
-      }
-    }
-  }
-};
-
+// Expose
 return Formatter;
+
 
 });

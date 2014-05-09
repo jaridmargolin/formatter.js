@@ -6,7 +6,7 @@
  */
 
 
-define(function () {
+
 
 
 // Define module
@@ -85,7 +85,6 @@ inptSel.set = function (el, pos) {
 
 
 // Expose
-return inptSel;
+module.exports = inptSel;
 
 
-});

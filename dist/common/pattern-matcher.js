@@ -7,10 +7,8 @@
 */
 
 
-define([
-  'pattern',
-  'utils'
-], function (pattern, utils) {
+var pattern = require('pattern');
+var utils = require('utils');
 
 
 //
@@ -73,7 +71,6 @@ function patternMatcher (patternSpec) {
 
 
 // Expose
-return patternMatcher;
+module.exports = patternMatcher;
 
 
-});

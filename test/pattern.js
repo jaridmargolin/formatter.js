@@ -1,17 +1,14 @@
-/*
- * test/utils.js:
- *
- * (C) 2013 First Opinion
- * MIT LICENCE
- *
+/*!
+ * test/pattern.js
+ * 
+ * Copyright (c) 2014 First Opinion
  */
 
-// 3rd party
-var should = require('chai').should(),
-    assert = require('chai').assert;
 
-// first party
-var pattern = require('../src/pattern');
+define([
+  'proclaim',
+  'pattern'
+], function (assert, pattern) {
 
 
 //
@@ -23,6 +20,7 @@ describe('pattern.js', function () {
   // Create an object holding all formatted characters
   // with corresponding positions
   describe('parse', function () {
+
     it('Should return an obj with pattern info', function () {
       var result = pattern.parse('({{9A*}}) {{9A*}}-{{AAAA}}');
       assert.deepEqual(result.chars, {
@@ -47,6 +45,7 @@ describe('pattern.js', function () {
     });
 
     describe('edge cases', function () {
+
       it('Should parse a pattern with a leading char', function () {
         var result = pattern.parse('_{{**}}');
 
@@ -72,7 +71,12 @@ describe('pattern.js', function () {
         });
         assert.equal(result.mLength, 3);
       });
+
     });
+    
   });
+
+});
+
 
 });
