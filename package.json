@@ -37,5 +37,8 @@
     "proclaim": "~2.0.0",
     "sinon": "~1.9.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "spm": {
+    "main": "dist/formatter.js"
+  }
 }
