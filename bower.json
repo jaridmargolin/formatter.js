@@ -13,5 +13,11 @@
     "src",
     "docs",
     "test"
+  ],
+  "main": [
+    "dist/formatter.js",
+    "dist/formatter.min.js",
+    "dist/jquery.formatter.js",
+    "dist/jquery.formatter.min.js"
   ]
 }
