@@ -375,7 +375,11 @@ var inptSel = function () {
         };
       }
       // Uh-Oh. We must be IE. Fun with TextRange!!
-      var range = document.selection.createRange();
+      var range;
+      try {
+        range = document.selection.createRange();
+      } catch (err) {
+      }
       // Determine if there is a selection
       if (range && range.parentElement() === el) {
         var inputRange = el.createTextRange(), endRange = el.createTextRange(), length = el.value.length;
@@ -391,7 +395,7 @@ var inptSel = function () {
             end: length
           };
         }
-        // Note: moveStart usually returns the units moved, which 
+        // Note: moveStart usually returns the units moved, which
         // one may think is -length, however, it will stop when it
         // gets to the begin of the range, thus giving us the
         // negative value of the pos.
