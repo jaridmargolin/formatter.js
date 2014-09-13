@@ -315,9 +315,26 @@ Formatter.prototype._formatValue = function (ignoreCaret) {
   // Set value and adhere to maxLength
   this.el.value = this.val.substr(0, this.mLength);
 
+  // Triggers the input event
+  this._triggerInputEvent();
+
   // Set new caret position
   if ((typeof ignoreCaret) === 'undefined' || ignoreCaret === false) {
     inptSel.set(this.el, this.newPos);
+  }
+};
+
+//
+// @private
+// Manually trigger input event
+//
+Formatter.prototype._triggerInputEvent = function () {
+  if ('createEvent' in document) {
+    var evt = document.createEvent('HTMLEvents');
+    evt.initEvent('input', true, true);
+    this.el.dispatchEvent(evt);
+  } else {
+    this.el.fireEvent('oninput');
   }
 };
 
