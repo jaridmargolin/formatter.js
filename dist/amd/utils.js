@@ -15,6 +15,13 @@ var utils = {};
 // Useragent info for keycode handling
 var uAgent = (typeof navigator !== 'undefined') ? navigator.userAgent : null;
 
+// Detect Google Chrome on Android
+if (uAgent) {
+  var uAgentLowercase = uAgent.toLowerCase();
+  var isAndroid = uAgentLowercase.indexOf('android') !== -1;
+  var isChrome = uAgentLowercase.indexOf('chrome') !== -1;
+}
+
 //
 // Shallow copy properties from n objects to destObj
 //
@@ -70,8 +77,13 @@ utils.preventDefault = function (evt) {
 // clipboard data
 //
 utils.getClip = function (evt) {
-  if (evt.clipboardData) { return evt.clipboardData.getData('Text'); }
+  // Chrome on Android has a bug in clipboardData.getData()
+  // it returns an empty sting instead of actual data.
+  // https://code.google.com/p/chromium/issues/detail?id=369101
+  // https://github.com/firstopinion/formatter.js/issues/67
+  if (evt.clipboardData && !(uAgent && isChrome && isAndroid)) { return evt.clipboardData.getData('Text'); }
   if (window.clipboardData) { return window.clipboardData.getData('Text'); }
+  return null;
 };
 
 //
