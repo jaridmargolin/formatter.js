@@ -191,8 +191,23 @@ Formatter.prototype._keyPress = function (evt) {
 //
 Formatter.prototype._paste = function (evt) {
   // Process the clipboard paste and prevent default
-  this._processKey(utils.getClip(evt), false);
-  return utils.preventDefault(evt);
+  var clipboardData = utils.getClip(evt);
+
+  if (clipboardData !== null) {
+    // In case clipboardData is present,
+    // process the clipboard paste and prevent default
+    this._processKey(utils.getClip(evt), false);
+    return utils.preventDefault(evt);
+
+  } else {
+    //In case clipboardData is null allow browser to handle paste
+    //and try to format new field value
+    var ctx = this;
+
+    window.setTimeout(function(){
+      ctx._processKey('', false, true);
+    }, 0);
+  }
 };
 
 //
