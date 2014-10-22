@@ -271,7 +271,7 @@ var utils = function () {
             'keyCode': 40
           },
           'F5': {
-            'which': 116,
+            'which': 0,
             'keyCode': 116
           }
         };
