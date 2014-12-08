@@ -26,7 +26,7 @@
     // Browser globals
     factory(root.jQuery);
   }
-}(this, function (jQuery) {
+}(this, function ($) {
 
 
 /*
