@@ -342,10 +342,10 @@ describe('formatter.js', function () {
       });
     });
 
-    it('Should remove a format character when it is the last character on backspace key', function (done) {
+    it('Should remove a format character and preceeding character when it is the last character on backspace key', function (done) {
       fakey.str(el, '123', function () {
         fakey.key(el, 'backspace', function () {
-          assert.equal(formatted.el.value, '(123');
+          assert.equal(formatted.el.value, '(12');
           done();
         });
       });

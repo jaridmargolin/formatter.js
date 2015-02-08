@@ -241,9 +241,16 @@ Formatter.prototype._processKey = function (chars, delKey, ignoreCaret) {
 
   // or Backspace and not at start
   } else if (delKey && this.sel.begin - 1 >= 0) {
+    
+    // Increase the backspace distance for every
+    // placeholder character at the end of the selection
+    var backspaceDistance = 1;
+    while (!this.opts.persistent && this.chars[this.sel.end - backspaceDistance]) {
+      backspaceDistance++;
+    }
 
     // Always have a delta of at least -1 for the character being deleted.
-    this.val = utils.removeChars(this.val, this.sel.end -1, this.sel.end);
+    this.val = utils.removeChars(this.val, this.sel.end - backspaceDistance, this.sel.end);
     this.delta -= 1;
 
   // or Backspace and at start - exit
