@@ -245,7 +245,7 @@ Formatter.prototype._processKey = function (chars, delKey, ignoreCaret) {
     // Increase the backspace distance for every
     // placeholder character at the end of the selection
     var backspaceDistance = 1;
-    while (this.chars[this.sel.end - backspaceDistance]) {
+    while (!this.opts.persistent && this.chars[this.sel.end - backspaceDistance]) {
       backspaceDistance++;
     }
 
