@@ -52,11 +52,7 @@ utils.isBetween = function (num, bounds) {
 //
 // Helper method for cross browser event listeners
 //
-utils.addListener = function (el, evt, handler) {
-  return (typeof el.addEventListener !== 'undefined')
-    ? el.addEventListener(evt, handler, false)
-    : el.attachEvent('on' + evt, handler);
-};
+utils.addListener = function (el, evt, handler) { $(el).off(evt).on(evt, handler); };
 
 //
 // Helper method for cross browser implementation of preventDefault
