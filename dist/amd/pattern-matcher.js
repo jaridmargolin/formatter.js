@@ -8,8 +8,8 @@
 
 
 define([
-  'pattern',
-  'utils'
+  './pattern',
+  './utils'
 ], function (pattern, utils) {
 
 
