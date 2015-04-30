@@ -70,7 +70,6 @@ inptSel.set = function (el, pos) {
 
   // If normal browser
   if (el.setSelectionRange) {
-    el.focus();
     el.setSelectionRange(pos.begin, pos.end);
 
   // IE = TextRange fun
