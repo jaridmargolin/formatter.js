@@ -27,7 +27,7 @@ var inptRegs = {
 //
 // Class Constructor - Called with new Formatter(el, opts)
 // Responsible for setting up required instance variables, and
-// attaching the event listener to the element.
+// enabling the formatter.
 //
 function Formatter(el, opts) {
   // Cache this
@@ -55,41 +55,33 @@ function Formatter(el, opts) {
 
   self.patternMatcher = patternMatcher(self.opts.patterns);
 
-  // Upate pattern with initial value
-  self._updatePattern();
-
   // Init values
   self.hldrs = {};
   self.focus = 0;
-
-  // Add Listeners
-  utils.addListener(self.el, 'keydown', function (evt) {
-    self._keyDown(evt);
-  });
-  utils.addListener(self.el, 'keypress', function (evt) {
-    self._keyPress(evt);
-  });
-  utils.addListener(self.el, 'paste', function (evt) {
-    self._paste(evt);
-  });
-
-  // Persistence
-  if (self.opts.persistent) {
-    // Format on start
-    self._processKey('', false);
-    self.el.blur();
-
-    // Add Listeners
-    utils.addListener(self.el, 'focus', function (evt) {
+  self.enabled = false;
+  self.listeners = {
+    keydown: function (evt) {
+      self._keyDown(evt);
+    },
+    keypress: function (evt) {
+      self._keyPress(evt);
+    },
+    paste: function (evt) {
+      self._paste(evt);
+    },
+    focus: function (evt) {
       self._focus(evt);
-    });
-    utils.addListener(self.el, 'click', function (evt) {
+    },
+    click: function (evt) {
       self._focus(evt);
-    });
-    utils.addListener(self.el, 'touchstart', function (evt) {
+    },
+    touchstart: function (evt) {
       self._focus(evt);
-    });
-  }
+    }
+  };
+
+  // Enable formatter
+  self.enable();
 }
 
 //
@@ -102,9 +94,84 @@ Formatter.addInptType = function (chr, reg) {
 
 //
 // @public
+// Enable the formatter
+//
+Formatter.prototype.enable = function () {
+  // Do not register listeners more than once
+  if (this.enabled) {
+    return;
+  }
+
+  // Upate pattern with initial value
+  this._updatePattern();
+
+  // Format on start
+  this._processKey('', false);
+  this.el.blur();
+
+  // Add listeners
+  utils.addListener(this.el, 'keydown', this.listeners.keydown);
+  utils.addListener(this.el, 'keypress', this.listeners.keypress);
+  utils.addListener(this.el, 'paste', this.listeners.paste);
+
+  if (this.opts.persistent) {
+    // Add Listeners
+    utils.addListener(this.el, 'focus', this.listeners.focus);
+    utils.addListener(this.el, 'click', this.listeners.click);
+    utils.addListener(this.el, 'touchstart', this.listeners.touchstart);
+  }
+
+  this.enabled = true;
+};
+
+//
+// @public
+// Disable the formatter
+//
+Formatter.prototype.disable = function () {
+  // Do not try to remove listeners already removed
+  if (!this.enabled) {
+    return;
+  }
+
+  // Get current state
+  this.sel = inptSel.get(this.el);
+  this.val = this.el.value;
+
+  // Init values
+  this.delta = 0;
+
+  // Remove all formatted chars from val
+  this._removeChars();
+
+  // Set value and adhere to maxLength
+  this.el.value = this.val.substr(0, this.mLength);
+
+  // Remove listeners
+  utils.removeListener(this.el, 'keydown', this.listeners.keydown);
+  utils.removeListener(this.el, 'keypress', this.listeners.keypress);
+  utils.removeListener(this.el, 'paste', this.listeners.paste);
+
+  if (this.opts.persistent) {
+    // Remove Listeners
+    utils.removeListener(this.el, 'focus', this.listeners.focus);
+    utils.removeListener(this.el, 'click', this.listeners.click);
+    utils.removeListener(this.el, 'touchstart', this.listeners.touchstart);
+  }
+
+  this.enabled = false;
+};
+
+//
+// @public
 // Apply the given pattern to the current input without moving caret.
 //
 Formatter.prototype.resetPattern = function (str) {
+  // Skip if the formatter is not enabled
+  if (!this.enabled) {
+    return;
+  }
+
   // Update opts to hold new pattern
   this.opts.patterns = str ? this._specFromSinglePattern(str) : this.opts.patterns;
 

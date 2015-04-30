@@ -121,6 +121,38 @@ Fairly self explanatory here :) reset the pattern on an existing Formatter insta
 
     $('#selector').formatter().resetPattern();
 
+#### enable()
+
+Enable the formatter.
+
+**Vanilla Javascript**
+
+(assuming you already created a new instance and saved it to the var `formatted`)
+
+    formatted.enable();
+
+**Jquery**
+
+(assuming you already initiated formatter on `#selector`)
+
+    $('#selector').formatter().enable();
+
+#### disable()
+
+Disable the formatter.
+
+**Vanilla Javascript**
+
+(assuming you already created a new instance and saved it to the var `formatted`)
+
+    formatted.disable();
+
+**Jquery**
+
+(assuming you already initiated formatter on `#selector`)
+
+    $('#selector').formatter().disable();
+
 
 
 Tests

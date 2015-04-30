@@ -72,6 +72,8 @@ describe('formatter.js', function () {
       // Check init values
       assert.isObject(formatted.hldrs);
       assert.isNumber(formatted.focus);
+      assert.isBoolean(formatted.enabled);
+      assert.isObject(formatted.listeners);
     });
 
     it('Should natively handle home, end, and arrow keys', function (done) {
@@ -114,6 +116,38 @@ describe('formatter.js', function () {
       fakey.str(el, '24567890', function () {
         formatted.resetPattern('{{999}}.{{999}}.{{9999}}');
         assert.equal(formatted.el.value, '245.678.90  ');
+        done();
+      });
+    });
+
+    it('Should remove format when disable method is called', function (done) {
+      createInstance('({{999}}) {{999}}-{{9999}}');
+
+      fakey.str(el, '24567890', function () {
+        formatted.disable();
+        assert.equal(formatted.el.value, '24567890');
+        done();
+      });
+    });
+
+    it('Should add format again when enable method is called', function (done) {
+      createInstance('({{999}}) {{999}}-{{9999}}');
+
+      fakey.str(el, '24567890', function () {
+        formatted.disable();
+        formatted.enable();
+        assert.equal(formatted.el.value, '(245) 678-90  ');
+        done();
+      });
+    });
+
+    it('Should not update value when resetPattern method is called and the formatter is disabled', function (done) {
+      createInstance('({{999}}) {{999}}-{{9999}}');
+
+      fakey.str(el, '24567890', function () {
+        formatted.disable();
+        formatted.resetPattern('{{999}}.{{999}}.{{9999}}');
+        assert.equal(formatted.el.value, '24567890');
         done();
       });
     });
