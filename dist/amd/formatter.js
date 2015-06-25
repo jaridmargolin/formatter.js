@@ -6,9 +6,9 @@
  */
 
 define([
-  'pattern-matcher',
-  'inpt-sel',
-  'utils'
+  './pattern-matcher',
+  './inpt-sel',
+  './utils'
 ], function (patternMatcher, inptSel, utils) {
 
 
@@ -330,7 +330,7 @@ Formatter.prototype._removeChars = function () {
   if (this.sel.end > this.focus) {
     this.delta += this.sel.end - this.focus;
   }
-  
+
   // Account for shifts during removal
   var shift = 0;
 

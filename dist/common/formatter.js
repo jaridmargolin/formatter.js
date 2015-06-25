@@ -5,9 +5,9 @@
  *
  */
 
-var patternMatcher = require('pattern-matcher');
-var inptSel = require('inpt-sel');
-var utils = require('utils');
+var patternMatcher = require('./pattern-matcher');
+var inptSel = require('./inpt-sel');
+var utils = require('./utils');
 
 
 // Defaults
@@ -328,7 +328,7 @@ Formatter.prototype._removeChars = function () {
   if (this.sel.end > this.focus) {
     this.delta += this.sel.end - this.focus;
   }
-  
+
   // Account for shifts during removal
   var shift = 0;
 
@@ -459,5 +459,6 @@ Formatter.prototype._specFromSinglePattern = function (patternStr) {
 
 // Expose
 module.exports = Formatter;
+
 
 
