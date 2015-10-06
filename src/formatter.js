@@ -297,6 +297,10 @@ Formatter.prototype._nextPos = function () {
 // instance pattern. Also responsible for updating
 //
 Formatter.prototype._formatValue = function (ignoreCaret) {
+  
+  // Don't format readonly and disabled fields
+  if(this.el.readOnly || this.el.disabled) return;
+  
   // Set caret pos
   this.newPos = this.sel.end + this.delta;
 
