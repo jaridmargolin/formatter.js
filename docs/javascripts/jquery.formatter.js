@@ -217,7 +217,7 @@ var utils = function () {
     //     'uparrow': { 'which': 38, 'keyCode': 38 },
     //     'rightarrow': { 'which': 39, 'keyCode': 39 },
     //     'downarrow': { 'which': 40, 'keyCode': 40 },
-    //     'F5': { 'which': 116, 'keyCode': 116 }
+    //     'F5': { 'which': 0, 'keyCode': 116 }
     //   };
     //   return utils.getMatchingKey(which, keyCode, keys);
     // };
@@ -259,7 +259,7 @@ var utils = function () {
             'keyCode': 40
           },
           'F5': {
-            'which': 116,
+            'which': 0,
             'keyCode': 116
           }
         };
