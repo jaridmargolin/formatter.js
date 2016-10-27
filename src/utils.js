@@ -59,6 +59,16 @@ utils.addListener = function (el, evt, handler) {
 };
 
 //
+// Helper method for cross browser implementation for removing
+// event listeners
+//
+utils.removeListener = function (el, evt, handler) {
+  return (typeof el.removeEventListener !== 'undefined')
+    ? el.removeEventListener(evt, handler, false)
+    : el.detachEvent('on' + evt, handler);
+};
+
+//
 // Helper method for cross browser implementation of preventDefault
 //
 utils.preventDefault = function (evt) {

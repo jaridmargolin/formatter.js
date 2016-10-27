@@ -64,16 +64,18 @@ function Formatter(el, opts) {
   self.hldrs = {};
   self.focus = 0;
 
+  // Store references to event handlers to be able to remove them
+  self._handlers = {
+    keyDown: self._keyDown.bind(self),
+    keyPress: self._keyPress.bind(self),
+    paste: self._paste.bind(self),
+    focus: self._focus.bind(self),
+  };
+
   // Add Listeners
-  utils.addListener(self.el, 'keydown', function (evt) {
-    self._keyDown(evt);
-  });
-  utils.addListener(self.el, 'keypress', function (evt) {
-    self._keyPress(evt);
-  });
-  utils.addListener(self.el, 'paste', function (evt) {
-    self._paste(evt);
-  });
+  utils.addListener(self.el, 'keydown', self._handlers.keyDown);
+  utils.addListener(self.el, 'keypress', self._handlers.keyPress);
+  utils.addListener(self.el, 'paste', self._handlers.paste);
 
   // Persistence
   if (self.opts.persistent) {
@@ -82,17 +84,27 @@ function Formatter(el, opts) {
     self.el.blur();
 
     // Add Listeners
-    utils.addListener(self.el, 'focus', function (evt) {
-      self._focus(evt);
-    });
-    utils.addListener(self.el, 'click', function (evt) {
-      self._focus(evt);
-    });
-    utils.addListener(self.el, 'touchstart', function (evt) {
-      self._focus(evt);
-    });
+    utils.addListener(self.el, 'focus', self._handlers.focus);
+    utils.addListener(self.el, 'click', self._handlers.focus);
+    utils.addListener(self.el, 'touchstart', self._handlers.focus);
   }
 }
+
+//
+// @public
+// Remove event handlers
+//
+Formatter.prototype.destroy = function () {
+  utils.removeListener(this.el, 'keydown', this._handlers.keyDown);
+  utils.removeListener(this.el, 'keypress', this._handlers.keyPress);
+  utils.removeListener(this.el, 'paste', this._handlers.paste);
+
+  if (this.opts.persistent) {
+    utils.removeListener(this.el, 'focus', this._handlers.focus);
+    utils.removeListener(this.el, 'click', this._handlers.focus);
+    utils.removeListener(this.el, 'touchstart', this._handlers.focus);
+  }
+};
 
 //
 // @public
