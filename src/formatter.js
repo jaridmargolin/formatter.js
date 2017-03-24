@@ -74,6 +74,23 @@ function Formatter(el, opts) {
   utils.addListener(self.el, 'paste', function (evt) {
     self._paste(evt);
   });
+  utils.addListener(self.el, 'input', function (evt) {
+    self._keyPress(evt);
+    if (self.el != null) {
+      if (self.el.createTextRange) {
+        var range = self.el.createTextRange();
+        range.move('character', self.el.value.length);
+        range.select();
+      } else {
+        if(self.el.selectionStart) {
+          self.el.focus();
+          self.el.setSelectionRange(self.el.value.length, self.el.value.length);
+        } else {
+          self.el.focus();
+        }
+      }
+    }
+  });
 
   // Persistence
   if (self.opts.persistent) {
