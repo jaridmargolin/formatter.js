@@ -77,12 +77,12 @@ function Formatter(el, opts) {
   utils.addListener(self.el, 'input', function (evt) {
     self._keyPress(evt);
     if (self.el !== null) {
-      if (self.el.createTextRange) {
+      if (typeof self.el.createTextRange !== 'undefined') {
         var range = self.el.createTextRange();
         range.move('character', self.el.value.length);
         range.select();
       } else {
-        if(self.el.selectionStart) {
+        if(typeof self.el.selectionStart !== 'undefined') {
           self.el.focus();
           self.el.setSelectionRange(self.el.value.length, self.el.value.length);
         } else {
