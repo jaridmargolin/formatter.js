@@ -76,7 +76,7 @@ function Formatter(el, opts) {
   });
   utils.addListener(self.el, 'input', function (evt) {
     self._keyPress(evt);
-    if (self.el != null) {
+    if (self.el !== null) {
       if (self.el.createTextRange) {
         var range = self.el.createTextRange();
         range.move('character', self.el.value.length);
